@@ -1,0 +1,857 @@
+### order items controller / index
+GET http://127.0.0.1:8000/api/order-items
+
+# ========================================
+# PRODUCT IMAGE TESTS - SINGLE IMAGE PATH
+# ========================================
+
+### Create new product with single image (multipart)
+POST http://localhost:8000/api/products
+Accept: application/json
+Content-Type: application/json
+
+{
+  "category_id": 1,
+  "name": "Sample Product",
+  "slug": "sample-product",
+  "base_price": 499.99,
+  "stock_quantity": 10,
+  "type": "premium"
+}
+
+### Update existing product image (replace, multipart)
+POST http://localhost:8000/api/products/0198a86e-14b9-7282-8758-6edea240818b
+Accept: application/json
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="_method"
+
+PUT
+--WebAppBoundary
+Content-Disposition: form-data; name="image"; filename="buckle-new.jpg"
+Content-Type: image/jpeg
+
+< C:\Users\niggs\Downloads\500580978_3006632366172183_4895755114294238585_n.png
+--WebAppBoundary--
+
+# ========================================
+# PRODUCT VARIANT IMAGE TESTS - SINGLE IMAGE PATH
+# ========================================
+
+### Create new product variant with image (multipart)
+POST http://localhost:8000/api/product-variants
+Accept: application/json
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="product_id"
+
+453ff287-95c4-41b7-a820-0e7d4889598b
+--WebAppBoundary
+Content-Disposition: form-data; name="name"
+
+Pink Sakura Size L
+--WebAppBoundary
+Content-Disposition: form-data; name="sku"
+
+PS-001-L
+--WebAppBoundary
+Content-Disposition: form-data; name="price_adjustment"
+
+0
+--WebAppBoundary
+Content-Disposition: form-data; name="stock_quantity"
+
+50
+--WebAppBoundary
+Content-Disposition: form-data; name="reserved_quantity"
+
+0
+--WebAppBoundary
+Content-Disposition: form-data; name="attributes[size]"
+
+L
+--WebAppBoundary
+Content-Disposition: form-data; name="attributes[color]"
+
+Gold
+--WebAppBoundary
+Content-Disposition: form-data; name="sort_order"
+
+1
+--WebAppBoundary
+Content-Disposition: form-data; name="image"; filename="golden-buckle-size-M.jpg"
+Content-Type: image/jpeg
+
+< C:\Users\niggs\Downloads\500580978_3006632366172183_4895755114294238585_n.png
+--WebAppBoundary--
+
+### Update product variant image (replace, multipart)
+POST http://localhost:8000/api/product-variants/1
+Accept: application/json
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="_method"
+
+PUT
+--WebAppBoundary
+Content-Disposition: form-data; name="image"; filename="golden-buckle-size-M-new.png"
+Content-Type: image/png
+
+< C:\Users\niggs\Downloads\500580978_3006632366172183_4895755114294238585_n.png
+--WebAppBoundary--
+
+### create new order item
+POST http://127.0.0.1:8000/api/order-items
+Content-Type: application/json
+Accept: application/json
+
+{
+    "order_id": "8558b0b0-a20b-4ece-822f-6ca39f06c368",
+    "product_id": "0d8876f7-262a-4593-8c93-f1b09ff145a3",
+    "product_variant_id": 1,
+    "product_name": "Red Shirt",
+    "product_sku": "RS-001",
+    "variant_name": "Large",
+    "variant_sku": "RS-001-L",
+    "product_attributes": {"color": "red", "size": "L"},
+    "quantity": 2,
+    "unit_price": 299.99,
+    "line_total": 599.98,
+    "discount_amount": 0,
+    "customization": null,
+    "customization_notes": null,
+    "fulfillment_status": "pending",
+    "quantity_shipped": 0,
+    "quantity_returned": 0
+}
+
+### order items controller / show
+GET http://127.0.0.1:8000/api/order-items/1
+
+### update item
+PUT http://127.0.0.1:8000/api/order-items/1
+Content-Type: application/json
+Accept: application/json
+
+{
+    "quantity": 3,
+    "line_total": 899.97
+}
+
+### delete order item
+DELETE http://127.0.0.1:8000/api/order-items/2
+Accept: application/json
+
+
+
+
+
+
+//----------product variants----------
+
+
+
+
+
+
+### Get all product variants
+GET http://127.0.0.1:8000/api/product-variants
+Accept: application/json
+
+### Create a new product variant
+POST http://127.0.0.1:8000/api/product-variants
+Content-Type: application/json
+Accept: application/json
+
+{
+  "product_id": "0198a86e-14b9-7282-8758-6edea240818b",
+  "name": "Variant A",
+  "sku": "SKU-001-A",
+  "price_adjustment": 10.50,
+  "stock_quantity": 100,
+  "reserved_quantity": 5,
+  "attributes": {
+    "color": "red",
+    "size": "M"
+  },
+  "images": [
+    "https://example.com/image1.jpg",
+    "https://example.com/image2.jpg"
+  ],
+  "primary_image_url": "https://example.com/image1.jpg",
+  "is_active": true,
+  "sort_order": 1
+}
+
+### Get a specific product variant
+GET http://127.0.0.1:8000/api/product-variants/1
+Accept: application/json
+
+### Update a product variant
+PUT http://127.0.0.1:8000/api/product-variants/9
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Updated Variant A",
+  "price_adjustment": 12.00,
+  "stock_quantity": 90
+}
+
+
+### Delete a product variant
+DELETE http://127.0.0.1:8000/api/product-variants/2
+Accept: application/json
+
+
+
+
+
+
+//----------category----------
+
+
+
+
+
+
+### Get all categories
+GET http://127.0.0.1:8000/api/categories
+Accept: application/json
+
+### Create a new category
+POST http://127.0.0.1:8000/api/categories
+Accept: application/json
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="name"
+
+Electronics
+--WebAppBoundary
+Content-Disposition: form-data; name="slug"
+
+electronics4
+--WebAppBoundary
+Content-Disposition: form-data; name="description"
+
+All kinds of electronic gadgets and devices
+--WebAppBoundary
+Content-Disposition: form-data; name="image"; filename="category.jpeg"
+Content-Type: image/jpeg
+
+< C:\Users\niggs\Downloads\500580978_3006632366172183_4895755114294238585_n.png
+
+--WebAppBoundary
+Content-Disposition: form-data; name="sort_order"
+
+1
+--WebAppBoundary--
+
+
+### Get a single category by ID
+GET http://127.0.0.1:8000/api/categories/2
+Accept: application/json
+
+### Update a category by ID
+PUT http://127.0.0.1:8000/api/categories/2
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Updated Electronics",
+  "sort_order": 2,
+  "is_active": false,
+  "meta_data": {
+    "seo_title": "Updated SEO Title"
+  }
+}
+
+### Delete a category by ID
+DELETE http://127.0.0.1:8000/api/categories/1
+Accept: application/json
+
+
+
+
+
+
+//---------inventroy movement--------
+
+
+
+
+
+### Get all inventory movements
+GET http://localhost:8000/api/inventory-movements
+Accept: application/json
+Authorization: Bearer YOUR_TOKEN_HERE
+
+
+### Create a new inventory movement
+POST http://localhost:8000/api/inventory-movements
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer YOUR_TOKEN_HERE
+
+{
+  "product_id": "a2693be0-5e6f-43e2-9690-361c6ffb68cd",
+  "product_variant_id": 1,
+  "order_id": null,
+  "user_id": "16aaf627-542d-493d-9676-3ae86f615366",
+  "type": "purchase",
+  "quantity_change": 10,
+  "quantity_before": 20,
+  "quantity_after": 30,
+  "notes": "Initial stock",
+  "reference": "INV-2025-001",
+  "meta_data": {
+    "source": "supplier A"
+  }
+}
+
+
+### Get a specific inventory movement
+GET http://localhost:8000/api/inventory-movements/1
+Accept: application/json
+Authorization: Bearer YOUR_TOKEN_HERE
+
+
+### Update an inventory movement
+PUT http://localhost:8000/api/inventory-movements/1
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer YOUR_TOKEN_HERE
+
+{
+  "quantity_change": 5,
+  "notes": "Adjusted after recount",
+  "meta_data": {
+    "adjusted_by": "user_id_123"
+  }
+}
+
+
+### Delete an inventory movement
+DELETE http://localhost:8000/api/inventory-movements/1
+Accept: application/json
+Authorization: Bearer YOUR_TOKEN_HERE
+
+### forgot-password testing
+GET http://localhost:8000/forgot-password
+Content-Type: application/json
+Accept: application/json
+
+
+### reset-password testing
+GET http://localhost:8000/reset-password/
+Accept: application/json
+
+### forgot-password email
+POST http://localhost:8000/api/forgot-password
+Content-Type: application/json
+Accept: application/json
+
+{
+    "email": "wschroeder@example.net"
+}
+
+### reset-password testing
+POST http://localhost:8000/api/reset-password/
+Content-Type: application/json
+Accept: application/json
+
+{
+    "token": "ef4beae4e53b9b7d8022089e4f6b5a8130dae1697a5ee0ca642c395ab19946d1",
+    "email": "wschroeder@example.net",
+    "password": "password",
+    "password_confirmation": "password"
+}
+
+### user with image
+POST http://localhost:8000/api/users  
+Accept: application/json
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="email"
+
+testuser5@example.com
+--WebAppBoundary
+Content-Disposition: form-data; name="password"
+
+secret123
+--WebAppBoundary
+Content-Disposition: form-data; name="role"
+
+customer
+--WebAppBoundary
+Content-Disposition: form-data; name="first_name"
+
+Test
+--WebAppBoundary
+Content-Disposition: form-data; name="last_name"
+
+User
+--WebAppBoundary
+Content-Disposition: form-data; name="image"; filename="profile.jpeg"
+Content-Type: image/jpeg
+
+< C:\Users\niggs\Downloads\blackface.jpeg
+--WebAppBoundary--
+
+###
+POST  http://localhost:8000/api/users/0198a284-f7af-7320-a290-c8d3fb7e5c6a
+Accept: application/json
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="_method"
+
+PUT
+--WebAppBoundary
+Content-Disposition: form-data; name="image"; filename="test.png"
+Content-Type: image/png
+
+< C:\Users\niggs\Downloads\500580978_3006632366172183_4895755114294238585_n.png
+--WebAppBoundary--
+
+###
+POST http://localhost:8000/api/categories/3
+Accept: application/json
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="_method"
+
+PUT
+--WebAppBoundary
+Content-Disposition: form-data; name="image"; filename="test.png"
+Content-Type: image/png
+
+< C:\Users\niggs\Downloads\500580978_3006632366172183_4895755114294238585_n.png
+--WebAppBoundary--
+
+# ========================================
+# CATEGORY TESTS - CLEAN ORGANIZED STRUCTURE
+# ========================================
+
+### Create new category with image (Buckle)
+POST http://localhost:8000/api/categories
+Accept: application/json
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="name"
+
+Buckle
+--WebAppBoundary
+Content-Disposition: form-data; name="slug"
+
+buckle12
+--WebAppBoundary
+Content-Disposition: form-data; name="description"
+
+Beautiful buckle designs for all occasions
+--WebAppBoundary
+Content-Disposition: form-data; name="image"; filename="buckle.jpg"
+Content-Type: image/jpeg
+
+< C:\Users\niggs\Downloads\500580978_3006632366172183_4895755114294238585_n.png
+--WebAppBoundary
+Content-Disposition: form-data; name="sort_order"
+
+1
+--WebAppBoundary--
+
+### Create new category with image (Charm)
+POST http://localhost:8000/api/categories
+Accept: application/json
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="name"
+
+Charm
+--WebAppBoundary
+Content-Disposition: form-data; name="slug"
+
+charm4
+--WebAppBoundary
+Content-Disposition: form-data; name="description"
+
+Elegant charms for your jewelry
+--WebAppBoundary
+Content-Disposition: form-data; name="image"; filename="charm.jpg"
+Content-Type: image/jpeg
+
+< C:\Users\niggs\Downloads\blackface.jpeg
+--WebAppBoundary
+Content-Disposition: form-data; name="sort_order"
+
+2
+--WebAppBoundary--
+
+### Update category with new image (update category ID 1)
+POST http://localhost:8000/api/categories/1
+Accept: application/json
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="_method"
+
+PUT
+--WebAppBoundary
+Content-Disposition: form-data; name="name"
+
+Buckle
+--WebAppBoundary
+Content-Disposition: form-data; name="image"; filename="new-buckle.jpg"
+Content-Type: image/jpeg
+
+< C:\Users\niggs\Downloads\500580978_3006632366172183_4895755114294238585_n.png
+--WebAppBoundary--
+
+### Update category image only (update category ID 2)
+POST http://localhost:8000/api/categories/2
+Accept: application/json
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="_method"
+
+PUT
+--WebAppBoundary
+Content-Disposition: form-data; name="image"; filename="new-charm.jpg"
+Content-Type: image/jpeg
+
+< C:\Users\niggs\Downloads\blackface.jpeg
+--WebAppBoundary--
+
+# ========================================
+# PRODUCT TESTS - CLEAN ORGANIZED STRUCTURE
+# ========================================
+
+### Create new product with image (Buckle category)
+POST http://localhost:8000/api/products
+Accept: application/json
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+1f052866-aee9-4357-9b92-657ffcd5efa1
+--WebAppBoundary
+Content-Disposition: form-data; name="category_id"
+
+1
+--WebAppBoundary
+Content-Disposition: form-data; name="name"
+
+Golden Buckle
+--WebAppBoundary
+Content-Disposition: form-data; name="slug"
+
+golden-buckle8
+--WebAppBoundary
+Content-Disposition: form-data; name="description"
+
+A beautiful golden buckle for formal occasions
+--WebAppBoundary
+Content-Disposition: form-data; name="short_description"
+
+Elegant golden buckle
+--WebAppBoundary
+Content-Disposition: form-data; name="sku"
+
+AE-006
+--WebAppBoundary
+Content-Disposition: form-data; name="base_price"
+
+299.99
+--WebAppBoundary
+Content-Disposition: form-data; name="cost_price"
+
+150.00
+--WebAppBoundary
+Content-Disposition: form-data; name="stock_quantity"
+
+10
+--WebAppBoundary
+Content-Disposition: form-data; name="type"
+
+premium
+--WebAppBoundary
+Content-Disposition: form-data; name="image"; filename="golden-buckle.jpg"
+Content-Type: image/jpeg
+
+< C:\Users\niggs\Downloads\500580978_3006632366172183_4895755114294238585_n.png
+--WebAppBoundary
+
+### Create new product with image (Charm category)
+POST http://localhost:8000/api/products
+Accept: application/json
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="category_id"
+
+2
+--WebAppBoundary
+Content-Disposition: form-data; name="name"
+
+Silver Charm
+--WebAppBoundary
+Content-Disposition: form-data; name="slug"
+
+silver-charm2
+--WebAppBoundary
+Content-Disposition: form-data; name="description"
+
+A delicate silver charm for your bracelet
+--WebAppBoundary
+Content-Disposition: form-data; name="short_description"
+
+Delicate silver charm
+--WebAppBoundary
+Content-Disposition: form-data; name="sku"
+
+AF-001
+--WebAppBoundary
+Content-Disposition: form-data; name="base_price"
+
+199.99
+--WebAppBoundary
+Content-Disposition: form-data; name="cost_price"
+
+80.00
+--WebAppBoundary
+Content-Disposition: form-data; name="stock_quantity"
+
+15
+--WebAppBoundary
+Content-Disposition: form-data; name="type"
+
+classic
+--WebAppBoundary
+Content-Disposition: form-data; name="image"; filename="silver-charm.jpg"
+Content-Type: image/jpeg
+
+< C:\Users\niggs\Downloads\blackface.jpeg
+--WebAppBoundary
+
+### Update product with new image (update first product)
+POST http://localhost:8000/api/products/0198a86e-14b9-7282-8758-6edea240818b
+Accept: application/json
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="_method"
+
+PUT
+--WebAppBoundary
+Content-Disposition: form-data; name="name"
+
+Updated Golden Buckle
+--WebAppBoundary
+Content-Disposition: form-data; name="base_price"
+
+349.99
+--WebAppBoundary
+Content-Disposition: form-data; name="image"; filename="new-golden-buckle.jpg"
+Content-Type: image/jpeg
+
+< C:\Users\niggs\Downloads\500580978_3006632366172183_4895755114294238585_n.png
+--WebAppBoundary--
+
+### Update product image only (update second product)
+POST http://localhost:8000/api/products/0198a880-95f7-7344-882d-dca513ddfe52
+Accept: application/json
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="_method"
+
+PUT
+--WebAppBoundary
+Content-Disposition: form-data; name="image"; filename="new-silver-charm.jpg"
+Content-Type: image/jpeg
+
+< C:\Users\niggs\Downloads\blackface.jpeg
+--WebAppBoundary--
+
+# ========================================
+# VERIFICATION ENDPOINTS
+# ========================================
+
+### Get all categories (to see clean organized image paths)
+GET http://localhost:8000/api/categories
+Accept: application/json
+
+### Get all products (to see clean organized image paths)
+GET http://localhost:8000/api/products
+Accept: application/json
+
+### Get specific category (to see imageUrl)
+GET http://localhost:8000/api/categories/1
+Accept: application/json
+
+### Get specific product (to see imageUrl)
+GET http://localhost:8000/api/products/5140a227-3843-41e9-b9a6-1c0cb93bc123
+Accept: application/json
+
+# ========================================
+# TESTING NOTES
+# ========================================
+# 
+# Expected detailed directory structure:
+# storage/app/public/
+# ├── categories/
+# │   ├── buckle/
+# │   │   └── category-image.jpg
+# │   └── charm/
+# │       └── category-image.jpg
+# ├── products/
+# │   ├── buckle/
+# │   │   └── golden-buckle/
+# │   │       ├── golden-buckle.jpg
+# │   │       ├── golden-buckle-size-m.jpg
+# │   │       └── golden-buckle-size-s.jpg
+# │   └── charm/
+# │       └── silver-charm/
+# │           ├── silver-charm.jpg
+# │           ├── silver-charm-size-m.jpg
+# │           └── silver-charm-size-s.jpg
+# └── main/
+#     └── buckle1-image.jpg
+# 
+# When updating:
+# - Old images are deleted
+# - New images go to same directory
+# - Product variants stored in product-specific folders
+
+###
+
+POST http://localhost:8000/api/orders
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+Accept: application/json
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="order_number"
+
+ORD-2024-002
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="fulfillment_status"
+
+pending
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="payment_status"
+
+pending
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="currency"
+
+PHP
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="status"
+
+pending
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="shipping_address[0][first_name]"
+
+Jodie
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="shipping_address[0][last_name]"
+
+Blick
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="shipping_address[0][phone_number]"
+
++13234822903
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="shipping_address[0][address_line_1]"
+
+8815 Hilda Burg
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="shipping_address[0][postal_code]"
+
+26042-7501
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="shipping_address[0][city]"
+
+Crawfordland
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="shipping_address[0][region]"
+
+Region VI
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="order_items[0][product_id]"
+
+a44af4f7-4ce8-4a4f-bc36-99addaf069b2
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="order_items[0][quantity]"
+
+1
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="shipping_amount"
+
+15.00
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="tax_amount"
+
+7.50
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="email"
+
+customer2@example.com
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="phone"
+
++1987654321
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="notes"
+
+Fragile items, handle with care
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="payment-proof.jpeg"
+Content-Type: image/jpeg
+
+< C:\Users\niggs\Downloads\blackface.jpeg
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+
+
+### nga
+POST http://127.0.0.1:8000/api/orders
+Content-Type: application/json
+Accept: application/json
+
+{
+    "status": "pending_payment",
+    "fulfillment_status": "pending",
+    "payment_status": "pending",
+    "email": "guest@example.com",
+    "currency": "PHP",
+    "shipping_amount": 100,
+    "tax_amount": 100,
+    "shipping_address": {
+        "line1": "123 P. Burgos Street",
+        "line2": "Barangay 1",
+        "city": "Lipa",
+        "province": "Batangas",
+        "postal_code": "4217",
+        "country": "PH"
+    },
+    "billing_address": {
+        "line1": "123 P. Burgos Street",
+        "city": "Lipa",
+        "province": "Batangas",
+        "postal_code": "4217",
+        "country": "PH"
+    },
+    "order_items": [
+        {
+            "product_id": "7914e2ca-6a49-46df-b2d6-af65ad19bf0c",
+            "quantity": 1
+        }
+    ]
+}

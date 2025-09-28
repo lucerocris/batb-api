@@ -1,0 +1,125 @@
+### 
+GET http://127.0.0.1:8000/api/orders
+
+### 
+POST http://127.0.0.1:8000/api/orders
+Content-Type: application/json
+Accept: application/json
+
+{
+    "status": "pending_payment",
+    "fulfillment_status": "pending",
+    "payment_status": "pending",
+    "email": "guest@example.com",
+    "currency": "PHP",
+    "shipping_amount": 100,
+    "tax_amount": 100,
+    "shipping_address": {
+        "line1": "123 P. Burgos Street",
+        "line2": "Barangay 1",
+        "city": "Lipa",
+        "province": "Batangas",
+        "postal_code": "4217",
+        "country": "PH"
+    },
+    "billing_address": {
+        "line1": "123 P. Burgos Street",
+        "city": "Lipa",
+        "province": "Batangas",
+        "postal_code": "4217",
+        "country": "PH"
+    },
+    "order_items": [
+        {
+            "product_id": "89363c40-17d6-4920-91a9-42f34586d510",
+            "quantity": 1
+        }
+    ]
+}
+### nigga
+POST http://127.0.0.1:8000/api/orders
+Content-Type: multipart/form-data; boundary=MyBoundary
+Accept: application/json
+
+--MyBoundary
+Content-Disposition: form-data; name="status"
+
+pending_payment
+--MyBoundary
+Content-Disposition: form-data; name="fulfillment_status"
+
+pending
+--MyBoundary
+Content-Disposition: form-data; name="payment_status"
+
+pending
+--MyBoundary
+Content-Disposition: form-data; name="email"
+
+guest@example.com
+--MyBoundary
+Content-Disposition: form-data; name="currency"
+
+PHP
+--MyBoundary
+Content-Disposition: form-data; name="shipping_amount"
+
+100
+--MyBoundary
+Content-Disposition: form-data; name="tax_amount"
+
+100
+--MyBoundary
+Content-Disposition: form-data; name="shipping_address[line1]"
+
+123 P. Burgos Street
+--MyBoundary
+Content-Disposition: form-data; name="shipping_address[line2]"
+
+Barangay 1
+--MyBoundary
+Content-Disposition: form-data; name="shipping_address[city]"
+
+Lipa
+--MyBoundary
+Content-Disposition: form-data; name="shipping_address[province]"
+
+Batangas
+--MyBoundary
+Content-Disposition: form-data; name="shipping_address[postal_code]"
+
+4217
+--MyBoundary
+Content-Disposition: form-data; name="shipping_address[country]"
+
+PH
+--MyBoundary
+Content-Disposition: form-data; name="billing_address[line1]"
+
+123 P. Burgos Street
+--MyBoundary
+Content-Disposition: form-data; name="billing_address[city]"
+
+Lipa
+--MyBoundary
+Content-Disposition: form-data; name="billing_address[province]"
+
+Batangas
+--MyBoundary
+Content-Disposition: form-data; name="billing_address[postal_code]"
+
+4217
+--MyBoundary
+Content-Disposition: form-data; name="billing_address[country]"
+
+PH
+--MyBoundary
+Content-Disposition: form-data; name="order_items[0][product_id]"
+
+a44af4f7-4ce8-4a4f-bc36-99addaf069b2
+--MyBoundary
+Content-Disposition: form-data; name="order_items[0][quantity]"
+
+1
+--MyBoundary
+Content-Disposition: form-data; name=""

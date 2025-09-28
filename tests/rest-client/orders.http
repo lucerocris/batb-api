@@ -1,0 +1,347 @@
+### Bijou API - Order Management Tests
+
+# Base URL - Update this to match your local environment
+@baseUrl = http://localhost:8000/api
+@contentType = application/json
+@accept = application/json
+
+### 1. Get All Orders
+GET {{baseUrl}}/orders
+Accept: {{accept}}
+
+###
+
+### 2. Get Single Order
+GET {{baseUrl}}/orders/0c0c8cf3-b3c8-441f-ad51-d41d128db2de
+Accept: {{accept}}
+
+###
+
+### 3. Create New Order (without image)
+POST {{baseUrl}}/orders
+Content-Type: {{contentType}}
+Accept: {{accept}}
+
+{
+    "user_id": "0dfea0f0-54a2-4826-8828-6b1c15ab9ead",
+    "order_number": "ORD-7664",
+    "status": "pending_payment",
+    "fulfillment_status": "pending",
+
+    "shipping_address": [{"first_name": "Jodie","last_name":"Blick","phone_number":"+13234822903","address_line_1":"8815 Hilda Burg","postal_code":"26042-7501","city":"Crawfordland","region":"Region VI"}],
+
+    "billing_address": [{"address_line_1":"382 Jeanie Trail","city":"South Missourimouth","region":"Region VIII"}],
+    "shipping_amount": 10.00,
+    "currency": "PHP",
+    "payment_status": "pending",
+    "tax_amount": 5.00,
+    "email": "customer@example.com",
+    "phone": "+1234567890",
+    "notes": "Please deliver after 6 PM",
+    "order_date": "2025-08-18 03:48:04",
+    "orderItems": [
+        {
+            "product_id": "89363c40-17d6-4920-91a9-42f34586d510",
+            "quantity": 2,
+            "unit_price": 25.00
+        }
+    ]
+}
+
+###
+
+POST {{baseUrl}}/orders
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+Accept: {{accept}}
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="order_number"
+
+ORD-2024-002
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="fulfillment_status"
+
+pending
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="payment_status"
+
+pending
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="currency"
+
+PHP
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="status"
+
+pending
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="shipping_address[0][first_name]"
+
+Jodie
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="shipping_address[0][last_name]"
+
+Blick
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="shipping_address[0][phone_number]"
+
++13234822903
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="shipping_address[0][address_line_1]"
+
+8815 Hilda Burg
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="shipping_address[0][postal_code]"
+
+26042-7501
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="shipping_address[0][city]"
+
+Crawfordland
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="shipping_address[0][region]"
+
+Region VI
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="order_items[0][product_id]"
+
+a44af4f7-4ce8-4a4f-bc36-99addaf069b2
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="order_items[0][quantity]"
+
+1
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="shipping_amount"
+
+15.00
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="tax_amount"
+
+7.50
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="email"
+
+customer2@example.com
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="phone"
+
++1987654321
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="notes"
+
+Fragile items, handle with care
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="payment-proof.jpg"
+Content-Type: image/jpeg
+
+< C:\Users\niggs\Downloads\500580978_3006632366172183_4895755114294238585_n.png
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+
+
+###
+
+### 5. Update Order
+PUT {{baseUrl}}/orders/1
+Content-Type: {{contentType}}
+Accept: {{accept}}
+
+{
+    "status": "processing",
+    "shipping_address": "789 Pine St, City, State 12345",
+    "notes": "Updated delivery instructions"
+}
+
+###
+
+### 6. Update Order (with new image)
+PUT {{baseUrl}}/orders/1
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+Accept: {{accept}}
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="_method"
+
+PUT
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="status"
+
+shipped
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="notes"
+
+Updated with new payment proof
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="new-payment.jpg"
+Content-Type: image/jpeg
+
+< ./test-images/new-payment.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+
+### 7. Delete Order
+DELETE {{baseUrl}}/orders/1
+Accept: {{accept}}
+
+###
+
+### 8. Test Order with Complex Order Items
+POST {{baseUrl}}/orders
+Content-Type: {{contentType}}
+Accept: {{accept}}
+
+{
+    "user_id": 1,
+    "order_number": "ORD-2024-003",
+    "status": "pending",
+    "shipping_address": "321 Elm St, City, State 12345",
+    "billing_address": "321 Elm St, City, State 12345",
+    "shipping_amount": 20.00,
+    "tax_amount": 12.50,
+    "email": "premium@example.com",
+    "phone": "+1555123456",
+    "notes": "Premium customer - expedited shipping",
+    "orderItems": [
+        {
+            "product_id": 1,
+            "quantity": 5,
+            "unit_price": 100.00
+        },
+        {
+            "product_id": 2,
+            "quantity": 2,
+            "unit_price": 150.00
+        },
+        {
+            "product_id": 3,
+            "quantity": 1,
+            "unit_price": 200.00
+        }
+    ]
+}
+
+###
+
+### 9. Test Invalid Order (Missing Required Fields)
+POST {{baseUrl}}/orders
+Content-Type: {{contentType}}
+Accept: {{accept}}
+
+{
+    "user_id": 1,
+    "status": "pending"
+}
+
+###
+
+### 10. Test Order with Empty Order Items
+POST {{baseUrl}}/orders
+Content-Type: {{contentType}}
+Accept: {{accept}}
+
+{
+    "user_id": 1,
+    "order_number": "ORD-2024-004",
+    "status": "pending",
+    "shipping_address": "654 Maple Dr, City, State 12345",
+    "billing_address": "654 Maple Dr, City, State 12345",
+    "shipping_amount": 0.00,
+    "tax_amount": 0.00,
+    "email": "empty@example.com",
+    "phone": "+1555987654",
+    "notes": "Test order with no items",
+    "orderItems": []
+}
+
+###
+
+### 11. Test Order with Zero Quantities
+POST {{baseUrl}}/orders
+Content-Type: {{contentType}}
+Accept: {{accept}}
+
+{
+    "user_id": 1,
+    "order_number": "ORD-2024-005",
+    "status": "pending",
+    "shipping_address": "987 Cedar Ln, City, State 12345",
+    "billing_address": "987 Cedar Ln, City, State 12345",
+    "shipping_amount": 5.00,
+    "tax_amount": 2.50,
+    "email": "zero@example.com",
+    "phone": "+1555111111",
+    "notes": "Test order with zero quantities",
+    "orderItems": [
+        {
+            "product_id": 1,
+            "quantity": 0,
+            "unit_price": 25.00
+        }
+    ]
+}
+
+###
+
+### 12. Test Order with Negative Values
+POST {{baseUrl}}/orders
+Content-Type: {{contentType}}
+Accept: {{accept}}
+
+{
+    "user_id": 1,
+    "order_number": "ORD-2024-006",
+    "status": "pending",
+    "shipping_address": "147 Birch Rd, City, State 12345",
+    "billing_address": "147 Birch Rd, City, State 12345",
+    "shipping_amount": -5.00,
+    "tax_amount": -2.50,
+    "email": "negative@example.com",
+    "phone": "+1555222222",
+    "notes": "Test order with negative values",
+    "orderItems": [
+        {
+            "product_id": 1,
+            "quantity": 1,
+            "unit_price": -10.00
+        }
+    ]
+}
+
+###
+
+### 13. Test Non-existent Order
+GET {{baseUrl}}/orders/999999
+Accept: {{accept}}
+
+###
+
+### 14. Test Update Non-existent Order
+PUT {{baseUrl}}/orders/999999
+Content-Type: {{contentType}}
+Accept: {{accept}}
+
+{
+    "status": "completed"
+}
+
+###
+
+### 15. Test Delete Non-existent Order
+DELETE {{baseUrl}}/orders/999999
+Accept: {{accept}}
+
+###
+
+### Environment Variables (for VS Code REST Client extension)
+# @name = bijou-api
+# @baseUrl = http://localhost:8000/api
+# @authToken = your-auth-token-here
+
+### Notes:
+# 1. Update the @baseUrl variable to match your local Laravel development server
+# 2. Create a 'test-images' folder in your project root with sample images for testing
+# 3. Ensure your Laravel application is running: php artisan serve
+# 4. Make sure your database is properly configured and migrations are run
+# 5. The image upload tests require actual image files in the test-images directory
+# 6. Update user_id and product_id values to match your actual database records
