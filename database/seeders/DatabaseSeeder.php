@@ -141,6 +141,7 @@ class DatabaseSeeder extends Seeder
                 'type' => 'classic',
                 'original_price' => 1500.00,
                 'color' => 'Gray',
+                'image_name' => 'bulls.jpg',
             ],
             [
                 'name' => 'GAP Wilderness Shirt',
@@ -154,6 +155,7 @@ class DatabaseSeeder extends Seeder
                 'type' => 'classic',
                 'original_price' => 1800.00,
                 'color' => 'White',
+                'image_name' => 'gap.jpg',
             ],
             [
                 'name' => 'Netflix x One Piece Shirt',
@@ -167,6 +169,7 @@ class DatabaseSeeder extends Seeder
                 'type' => 'classic',
                 'original_price' => 1200.00,
                 'color' => 'Black',
+                'image_name' => 'onepiece.jpg',
             ],
             [
                 'name' => 'NBA x Cotton On LA Lakers Shirt',
@@ -180,6 +183,7 @@ class DatabaseSeeder extends Seeder
                 'type' => 'classic',
                 'original_price' => 1500.00,
                 'color' => 'Black',
+                'image_name' => 'LA.jpg',
             ],
             [
                 'name' => 'NBA x Cotton On Milwaukee Bucks Shirt',
@@ -193,6 +197,7 @@ class DatabaseSeeder extends Seeder
                 'type' => 'classic',
                 'original_price' => 1500.00,
                 'color' => 'Green',
+                'image_name' => 'bucks.jpg',
             ],
             [
                 'name' => 'NBA x Cotton On Brooklyn Nets Shirt',
@@ -206,6 +211,7 @@ class DatabaseSeeder extends Seeder
                 'type' => 'classic',
                 'original_price' => 1500.00,
                 'color' => 'Black',
+                'image_name' => 'nets.jpg',
             ],
             [
                 'name' => 'Nirvana Shirt',
@@ -219,6 +225,7 @@ class DatabaseSeeder extends Seeder
                 'type' => 'classic',
                 'original_price' => 1000.00,
                 'color' => 'Brown',
+                'image_name' => 'nirvana.jpg',
             ],
             [
                 'name' => 'Bape APUNVS Shirt',
@@ -232,6 +239,7 @@ class DatabaseSeeder extends Seeder
                 'type' => 'premium',
                 'original_price' => 2500.00,
                 'color' => 'Black',
+                'image_name' => 'bape.jpg',
             ],
             [
                 'name' => 'DKNY Jeans Shirt',
@@ -245,6 +253,7 @@ class DatabaseSeeder extends Seeder
                 'type' => 'premium',
                 'original_price' => 1800.00,
                 'color' => 'Violet',
+                'image_name' => 'dkny.jpg',
             ],
             [
                 'name' => 'NEXT Soul Searching Shirt',
@@ -258,6 +267,7 @@ class DatabaseSeeder extends Seeder
                 'type' => 'classic',
                 'original_price' => 800.00,
                 'color' => 'Black',
+                'image_name' => 'soulSearching.jpg',
             ],
         ];
 
@@ -310,7 +320,7 @@ class DatabaseSeeder extends Seeder
             'track_inventory' => true,
             'allow_backorder' => false,
             'type' => $productData['type'],
-            'image_path' => null,
+            'image_path' => null, // Instagram CDN URLs expire - upload images to storage instead
             'is_active' => true,
             'is_featured' => rand(0, 1) == 1,
             'available_from' => now(),
@@ -321,6 +331,42 @@ class DatabaseSeeder extends Seeder
             'purchase_count' => 0,
         ]);
 
+        // Handle image copying
+        $this->copyProductImage($product, $productData['image_name'], $category);
+
         return $product;
+    }
+
+    private function copyProductImage(Product $product, string $imageName, Category $category): void
+    {
+        // Path to seeder images (tracked in git)
+        $sourceImagePath = database_path("seeders/images/{$imageName}");
+
+        if (!File::exists($sourceImagePath)) {
+            $this->command->warn("⚠️  Image not found: {$imageName}");
+            return;
+        }
+
+        // Create storage directory structure
+        $categorySlug = Str::slug($category->name);
+        $productSlug = $product->slug;
+        $storageDir = "products/{$categorySlug}/{$productSlug}";
+
+        // Ensure directory exists
+        Storage::disk('public')->makeDirectory($storageDir);
+
+        // Copy image to storage
+        $extension = pathinfo($imageName, PATHINFO_EXTENSION);
+        $filename = "main.{$extension}";
+        $destinationPath = "{$storageDir}/{$filename}";
+
+        // Copy file
+        $imageContent = File::get($sourceImagePath);
+        Storage::disk('public')->put($destinationPath, $imageContent);
+
+        // Update product with image path
+        $product->update(['image_path' => $destinationPath]);
+
+        $this->command->info("📸 Copied image for: {$product->name}");
     }
 }
