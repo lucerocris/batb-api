@@ -28,74 +28,45 @@ class DatabaseSeeder extends Seeder
         $shirtsCategory = Category::create([
             'name' => 'Shirts & Tops',
             'slug' => 'shirts-tops',
-            'description' => 'Branded shirts, blouses, and tops from mall pullouts and thrift finds',
+            'description' => 'Branded shirts, blouses, and tops from thrift finds',
             'is_active' => true,
         ]);
 
-        $pantsCategory = Category::create([
-            'name' => 'Pants & Bottoms',
-            'slug' => 'pants-bottoms',
-            'description' => 'Quality pants, jeans, and bottoms from premium brands',
-            'is_active' => true,
-        ]);
-
-        $dressesCategory = Category::create([
-            'name' => 'Dresses',
-            'slug' => 'dresses',
-            'description' => 'Elegant dresses and formal wear from designer brands',
-            'is_active' => true,
-        ]);
-
-        $outerwearCategory = Category::create([
-            'name' => 'Outerwear',
-            'slug' => 'outerwear',
-            'description' => 'Jackets, coats, and outerwear from top fashion brands',
-            'is_active' => true,
-        ]);
-
-        $categories = collect([$shirtsCategory, $pantsCategory, $dressesCategory, $outerwearCategory]);
+        $categories = collect([$shirtsCategory]);
 
         // Create specific products
         $shirtProducts = $this->createShirtProducts($shirtsCategory);
-        $pantsProducts = $this->createPantsProducts($pantsCategory);
-        $dressProducts = $this->createDressProducts($dressesCategory);
-        $outerwearProducts = $this->createOuterwearProducts($outerwearCategory);
 
-        $products = $shirtProducts->concat($pantsProducts)->concat($dressProducts)->concat($outerwearProducts);
+        $products = $shirtProducts;
 
-        // Create variants for sizes and colors
+        // Create variants for sizes
         $variants = $products->flatMap(function ($product) {
-            if (fake()->boolean(80)) { // 80% chance of having variants
-                $variants = collect();
-                $sizes = ['XS', 'S', 'M', 'L', 'XL'];
-                $colors = ['Black', 'White', 'Navy', 'Gray', 'Beige'];
+            $variants = collect();
 
-                // Create size variants
-                foreach (fake()->randomElements($sizes, fake()->numberBetween(2, 4)) as $size) {
-                    $variants->push(ProductVariant::factory()->create([
-                        'product_id' => $product->id,
-                        'name' => "Size {$size}",
-                        'type' => 'size',
-                        'value' => $size,
-                        'stock_quantity' => fake()->numberBetween(0, 3), // Lower stock for thrift items
-                    ]));
-                }
+            // Each product has only one size variant based on the product data
+            $sizeData = $this->getProductSizeData($product->name);
 
-                $totalStock = $variants->sum('stock_quantity');
-                $product->update(['stock_quantity' => $totalStock]);
-                return $variants;
+            if ($sizeData) {
+                $variants->push(ProductVariant::factory()->create([
+                    'product_id' => $product->id,
+                    'name' => "Size {$sizeData['size']}",
+                    'type' => 'size',
+                    'value' => $sizeData['size'],
+                    'stock_quantity' => 1, // Single item thrift finds
+                ]));
+
+                $product->update(['stock_quantity' => 1]);
             }
 
-            $product->update(['stock_quantity' => fake()->numberBetween(0, 2)]); // Limited quantities
-            return collect();
+            return $variants;
         });
 
         // Create orders
         $orders = $users->flatMap(function ($user) use ($products, $variants) {
-            return Order::factory(fake()->numberBetween(1, 3))->create([
+            return Order::factory(fake()->numberBetween(0, 2))->create([
                 'user_id' => $user->id
             ])->each(function ($order) use ($products, $variants) {
-                foreach (range(1, fake()->numberBetween(1, 4)) as $_) {
+                foreach (range(1, fake()->numberBetween(1, 2)) as $_) {
                     $product = $products->random();
                     $productVariants = $variants->where('product_id', $product->id);
                     $variant = $productVariants->isNotEmpty() ? $productVariants->random() : null;
@@ -114,10 +85,10 @@ class DatabaseSeeder extends Seeder
         });
 
         // Create guest orders
-        $guestOrders = Order::factory(5)->create([
+        $guestOrders = Order::factory(3)->create([
             'user_id' => null
         ])->each(function ($order) use ($products, $variants) {
-            foreach (range(1, fake()->numberBetween(1, 3)) as $_) {
+            foreach (range(1, fake()->numberBetween(1, 2)) as $_) {
                 $product = $products->random();
                 $productVariants = $variants->where('product_id', $product->id);
                 $variant = $productVariants->isNotEmpty() ? $productVariants->random() : null;
@@ -145,14 +116,9 @@ class DatabaseSeeder extends Seeder
         $products->each(function ($product) use ($variants) {
             $productVariants = $variants->where('product_id', $product->id);
             if ($productVariants->isNotEmpty()) {
-                InventoryMovement::factory(fake()->numberBetween(1, 3))->create([
+                InventoryMovement::factory(1)->create([
                     'product_id' => $product->id,
-                    'product_variant_id' => $productVariants->random()->id
-                ]);
-            } else {
-                InventoryMovement::factory(fake()->numberBetween(1, 2))->create([
-                    'product_id' => $product->id,
-                    'product_variant_id' => null
+                    'product_variant_id' => $productVariants->first()->id
                 ]);
             }
         });
@@ -164,65 +130,135 @@ class DatabaseSeeder extends Seeder
     {
         $shirtData = [
             [
-                'name' => 'Nike Dri-FIT Training Tee',
-                'description' => 'Authentic Nike performance t-shirt from mall pullout. Features moisture-wicking technology and classic Nike swoosh. Perfect condition, never worn.',
-                'short_description' => 'Nike performance tee with Dri-FIT technology',
-                'base_price' => 1250.00,
-                'cost_price' => 300.00,
-                'brand' => 'Nike',
-                'condition' => 'Brand New',
-                'source' => 'Mall Pullout',
-                'type' => 'premium',
-                'original_price' => 2500.00
-            ],
-            [
-                'name' => 'Zara Oversized Button Shirt',
-                'description' => 'Stylish oversized button-up shirt from Zara. Thrifted find in excellent condition. Classic white with subtle texture.',
-                'short_description' => 'Zara oversized button shirt in white',
-                'base_price' => 890.00,
+                'name' => 'Bershka x NBA Chicago Bulls Shirt',
+                'description' => 'Bershka x NBA Chicago Bulls collaboration shirt in gray. Size L with oversized fit, featuring soft and lightweight cloth. Perfect for casual streetwear. Measurements: 28x22 inches.',
+                'short_description' => 'Bershka x NBA Chicago Bulls gray shirt, oversized fit',
+                'base_price' => 700.00,
                 'cost_price' => 200.00,
-                'brand' => 'Zara',
+                'brand' => 'Bershka',
                 'condition' => 'Excellent',
                 'source' => 'Thrift Store',
                 'type' => 'classic',
-                'original_price' => 1950.00
+                'original_price' => 1500.00,
+                'color' => 'Gray',
             ],
             [
-                'name' => 'Uniqlo Heattech Crew Neck',
-                'description' => 'Uniqlo\'s innovative Heattech long sleeve shirt. Mall pullout item with tags still attached. Thermal technology for warmth.',
-                'short_description' => 'Uniqlo Heattech thermal shirt',
-                'base_price' => 750.00,
-                'cost_price' => 180.00,
-                'brand' => 'Uniqlo',
-                'condition' => 'Brand New',
-                'source' => 'Mall Pullout',
+                'name' => 'GAP Wilderness Shirt',
+                'description' => 'GAP Wilderness shirt in white with a boxy fit. Size M featuring soft and lightweight fabric. Classic casual style perfect for everyday wear. Measurements: 26x19 inches.',
+                'short_description' => 'GAP Wilderness white shirt, boxy fit',
+                'base_price' => 700.00,
+                'cost_price' => 200.00,
+                'brand' => 'GAP',
+                'condition' => 'Excellent',
+                'source' => 'Thrift Store',
                 'type' => 'classic',
-                'original_price' => 1290.00
+                'original_price' => 1800.00,
+                'color' => 'White',
             ],
             [
-                'name' => 'H&M Vintage Band Tee',
-                'description' => 'Retro band t-shirt from H&M with vintage graphics. Thrifted piece with character and style. Soft cotton blend.',
-                'short_description' => 'H&M vintage band t-shirt',
+                'name' => 'Netflix x One Piece Shirt',
+                'description' => 'Netflix x One Piece collaboration shirt in black. Size XL with oversized fit and soft, lightweight fabric. Perfect for anime fans. Measurements: 30x24 inches.',
+                'short_description' => 'Netflix x One Piece black shirt, oversized fit',
+                'base_price' => 600.00,
+                'cost_price' => 180.00,
+                'brand' => 'Netflix',
+                'condition' => 'Excellent',
+                'source' => 'Thrift Store',
+                'type' => 'classic',
+                'original_price' => 1200.00,
+                'color' => 'Black',
+            ],
+            [
+                'name' => 'NBA x Cotton On LA Lakers Shirt',
+                'description' => 'NBA x Cotton On LA Lakers shirt in black. Size XL with oversized fit, featuring soft and lightweight cloth. Perfect for Lakers fans. Measurements: 30x24 inches.',
+                'short_description' => 'NBA x Cotton On LA Lakers black shirt',
+                'base_price' => 700.00,
+                'cost_price' => 200.00,
+                'brand' => 'Cotton On',
+                'condition' => 'Excellent',
+                'source' => 'Thrift Store',
+                'type' => 'classic',
+                'original_price' => 1500.00,
+                'color' => 'Black',
+            ],
+            [
+                'name' => 'NBA x Cotton On Milwaukee Bucks Shirt',
+                'description' => 'NBA x Cotton On Milwaukee Bucks shirt in green. Size L with oversized fit and soft, heavy cloth. Great quality for basketball fans. Measurements: 28x21 inches.',
+                'short_description' => 'NBA x Cotton On Milwaukee Bucks green shirt',
                 'base_price' => 650.00,
-                'cost_price' => 150.00,
-                'brand' => 'H&M',
+                'cost_price' => 190.00,
+                'brand' => 'Cotton On',
+                'condition' => 'Excellent',
+                'source' => 'Thrift Store',
+                'type' => 'classic',
+                'original_price' => 1500.00,
+                'color' => 'Green',
+            ],
+            [
+                'name' => 'NBA x Cotton On Brooklyn Nets Shirt',
+                'description' => 'NBA x Cotton On Brooklyn Nets shirt in black. Size XL with oversized fit, featuring soft and heavy cloth. Premium quality for Nets supporters. Measurements: 29x22 inches.',
+                'short_description' => 'NBA x Cotton On Brooklyn Nets black shirt',
+                'base_price' => 650.00,
+                'cost_price' => 190.00,
+                'brand' => 'Cotton On',
+                'condition' => 'Excellent',
+                'source' => 'Thrift Store',
+                'type' => 'classic',
+                'original_price' => 1500.00,
+                'color' => 'Black',
+            ],
+            [
+                'name' => 'Nirvana Shirt',
+                'description' => 'Vintage Nirvana band shirt in brown. Size XL with oversized fit and soft, lightweight fabric. Perfect for grunge and rock music fans. Measurements: 29x24 inches.',
+                'short_description' => 'Nirvana brown vintage band shirt, oversized fit',
+                'base_price' => 600.00,
+                'cost_price' => 180.00,
+                'brand' => 'Generic',
+                'condition' => 'Very Good',
+                'source' => 'Thrift Store',
+                'type' => 'classic',
+                'original_price' => 1000.00,
+                'color' => 'Brown',
+            ],
+            [
+                'name' => 'Bape APUNVS Shirt',
+                'description' => 'Bape APUNVS shirt in black. Size L with boxy fit and soft, lightweight cloth. Authentic streetwear style from the iconic Japanese brand. Measurements: 26x20 inches.',
+                'short_description' => 'Bape APUNVS black shirt, boxy fit',
+                'base_price' => 600.00,
+                'cost_price' => 180.00,
+                'brand' => 'Bape',
+                'condition' => 'Excellent',
+                'source' => 'Thrift Store',
+                'type' => 'premium',
+                'original_price' => 2500.00,
+                'color' => 'Black',
+            ],
+            [
+                'name' => 'DKNY Jeans Shirt',
+                'description' => 'DKNY Jeans shirt in violet, from the women\'s selection. Size L with oversized fit and soft, lightweight fabric. Stylish and comfortable casual wear. Measurements: 24x17 inches.',
+                'short_description' => 'DKNY Jeans violet shirt, women\'s oversized fit',
+                'base_price' => 600.00,
+                'cost_price' => 180.00,
+                'brand' => 'DKNY',
+                'condition' => 'Excellent',
+                'source' => 'Thrift Store',
+                'type' => 'premium',
+                'original_price' => 1800.00,
+                'color' => 'Violet',
+            ],
+            [
+                'name' => 'NEXT Soul Searching Shirt',
+                'description' => 'NEXT Soul Searching shirt in black, from the women\'s selection. Size L with loose fit and soft, lightweight cloth. Comfortable everyday style. Measurements: 24x19 inches.',
+                'short_description' => 'NEXT Soul Searching black shirt, women\'s loose fit',
+                'base_price' => 350.00,
+                'cost_price' => 100.00,
+                'brand' => 'NEXT',
                 'condition' => 'Good',
                 'source' => 'Thrift Store',
                 'type' => 'classic',
-                'original_price' => 990.00
+                'original_price' => 800.00,
+                'color' => 'Black',
             ],
-            [
-                'name' => 'Forever 21 Crop Top',
-                'description' => 'Trendy crop top from Forever 21 mall pullout. Features unique cut-out details and stretch fabric. Perfect for layering.',
-                'short_description' => 'Forever 21 crop top with cut-out details',
-                'base_price' => 450.00,
-                'cost_price' => 120.00,
-                'brand' => 'Forever 21',
-                'condition' => 'Brand New',
-                'source' => 'Mall Pullout',
-                'type' => 'classic',
-                'original_price' => 790.00
-            ]
         ];
 
         return collect($shirtData)->map(function ($productData) use ($category) {
@@ -230,118 +266,22 @@ class DatabaseSeeder extends Seeder
         });
     }
 
-    private function createPantsProducts(Category $category): \Illuminate\Support\Collection
+    private function getProductSizeData(string $productName): ?array
     {
-        $pantsData = [
-            [
-                'name' => 'Levi\'s 511 Slim Jeans',
-                'description' => 'Classic Levi\'s 511 slim fit jeans in dark wash. Thrifted premium denim in great condition. Authentic vintage styling.',
-                'short_description' => 'Levi\'s 511 slim fit jeans, dark wash',
-                'base_price' => 1890.00,
-                'cost_price' => 450.00,
-                'brand' => 'Levi\'s',
-                'condition' => 'Very Good',
-                'source' => 'Thrift Store',
-                'type' => 'premium',
-                'original_price' => 4500.00
-            ],
-            [
-                'name' => 'Mango Wide Leg Trousers',
-                'description' => 'Elegant wide leg trousers from Mango mall pullout. Professional look with comfortable fit. Perfect for office wear.',
-                'short_description' => 'Mango wide leg professional trousers',
-                'base_price' => 1350.00,
-                'cost_price' => 320.00,
-                'brand' => 'Mango',
-                'condition' => 'Brand New',
-                'source' => 'Mall Pullout',
-                'type' => 'premium',
-                'original_price' => 2890.00
-            ],
-            [
-                'name' => 'American Eagle Mom Jeans',
-                'description' => 'Trendy high-waisted mom jeans from American Eagle. Thrifted find with perfect vintage fit and light distressing.',
-                'short_description' => 'American Eagle high-waisted mom jeans',
-                'base_price' => 1650.00,
-                'cost_price' => 380.00,
-                'brand' => 'American Eagle',
-                'condition' => 'Excellent',
-                'source' => 'Thrift Store',
-                'type' => 'classic',
-                'original_price' => 3200.00
-            ]
+        $sizeMap = [
+            'Bershka x NBA Chicago Bulls Shirt' => ['size' => 'L'],
+            'GAP Wilderness Shirt' => ['size' => 'M'],
+            'Netflix x One Piece Shirt' => ['size' => 'XL'],
+            'NBA x Cotton On LA Lakers Shirt' => ['size' => 'XL'],
+            'NBA x Cotton On Milwaukee Bucks Shirt' => ['size' => 'L'],
+            'NBA x Cotton On Brooklyn Nets Shirt' => ['size' => 'XL'],
+            'Nirvana Shirt' => ['size' => 'XL'],
+            'Bape APUNVS Shirt' => ['size' => 'L'],
+            'DKNY Jeans Shirt' => ['size' => 'L'],
+            'NEXT Soul Searching Shirt' => ['size' => 'L'],
         ];
 
-        return collect($pantsData)->map(function ($productData) use ($category) {
-            return $this->createProduct($productData, $category);
-        });
-    }
-
-    private function createDressProducts(Category $category): \Illuminate\Support\Collection
-    {
-        $dressData = [
-            [
-                'name' => 'Massimo Dutti Midi Dress',
-                'description' => 'Sophisticated midi dress from Massimo Dutti. Mall pullout piece with elegant silhouette and premium fabric quality.',
-                'short_description' => 'Massimo Dutti elegant midi dress',
-                'base_price' => 2250.00,
-                'cost_price' => 550.00,
-                'brand' => 'Massimo Dutti',
-                'condition' => 'Brand New',
-                'source' => 'Mall Pullout',
-                'type' => 'premium',
-                'original_price' => 5800.00
-            ],
-            [
-                'name' => 'Bershka Floral Sundress',
-                'description' => 'Cute floral sundress from Bershka mall pullout. Perfect for casual summer days with adjustable straps and flowing fit.',
-                'short_description' => 'Bershka floral summer dress',
-                'base_price' => 950.00,
-                'cost_price' => 220.00,
-                'brand' => 'Bershka',
-                'condition' => 'Brand New',
-                'source' => 'Mall Pullout',
-                'type' => 'classic',
-                'original_price' => 1890.00
-            ]
-        ];
-
-        return collect($dressData)->map(function ($productData) use ($category) {
-            return $this->createProduct($productData, $category);
-        });
-    }
-
-    private function createOuterwearProducts(Category $category): \Illuminate\Support\Collection
-    {
-        $outerwearData = [
-            [
-                'name' => 'North Face Windbreaker',
-                'description' => 'Authentic North Face windbreaker jacket. Thrifted outdoor gear in excellent condition. Water-resistant and packable.',
-                'short_description' => 'North Face windbreaker jacket',
-                'base_price' => 3250.00,
-                'cost_price' => 750.00,
-                'brand' => 'The North Face',
-                'condition' => 'Excellent',
-                'source' => 'Thrift Store',
-                'type' => 'premium',
-                'original_price' => 7500.00
-            ],
-            [
-                'name' => 'Pull & Bear Denim Jacket',
-                'description' => 'Classic denim jacket from Pull & Bear mall pullout. Versatile layering piece with vintage wash and comfortable fit.',
-                'short_description' => 'Pull & Bear classic denim jacket',
-                'base_price' => 1450.00,
-                'cost_price' => 350.00,
-                'brand' => 'Pull & Bear',
-                'condition' => 'Brand New',
-                'source' => 'Mall Pullout',
-                'type' => 'classic',
-                'original_price' => 2990.00
-            ]
-        ];
-
-        return collect($outerwearData)->map(function ($productData) use ($category) {
-            return $this->createProduct($productData, $category);
-        });
+        return $sizeMap[$productName] ?? null;
     }
 
     private function createProduct(array $productData, Category $category): Product
@@ -356,59 +296,31 @@ class DatabaseSeeder extends Seeder
             'description' => $productData['description'],
             'short_description' => $productData['short_description'],
             'sku' => strtoupper(substr($productData['brand'], 0, 3) . Str::random(5)),
-            'base_price' => $productData['base_price'],
-            'cost_price' => $productData['cost_price'],
-            'stock_quantity' => rand(0, 3), // Limited stock for thrift/pullout items
-            'low_stock_threshold' => 1,
-            'track_inventory' => true,
-            'allow_backorder' => false,
-            'type' => $productData['type'], // Added the missing type field
+            'color' => $productData['color'],
             'brand' => $productData['brand'],
             'condition' => $productData['condition'],
             'source' => $productData['source'],
+            'base_price' => $productData['base_price'],
+            'sale_price' => null,
+            'cost_price' => $productData['cost_price'],
             'original_price' => $productData['original_price'],
+            'stock_quantity' => 1,
+            'reserved_quantity' => 0,
+            'low_stock_threshold' => 1,
+            'track_inventory' => true,
+            'allow_backorder' => false,
+            'type' => $productData['type'],
+            'image_path' => null,
             'is_active' => true,
-            'is_featured' => rand(0, 1),
+            'is_featured' => rand(0, 1) == 1,
             'available_from' => now(),
-            'purchase_count' => rand(0, 5),
+            'available_until' => null,
+            'meta_title' => null,
+            'meta_description' => null,
+            'tags' => null,
+            'purchase_count' => 0,
         ]);
 
-        // Handle image copying (on hold for now)
-        // $this->copyProductImage($product, $productData['image_name'], $category);
-
         return $product;
-    }
-
-    private function copyProductImage(Product $product, string $imageName, Category $category): void
-    {
-        // Path to seeder images (tracked in git)
-        $sourceImagePath = database_path("seeders/images/{$imageName}");
-
-        if (!File::exists($sourceImagePath)) {
-            $this->command->warn("⚠️  Image not found: {$imageName}");
-            return;
-        }
-
-        // Create storage directory structure
-        $categorySlug = Str::slug($category->name);
-        $productSlug = $product->slug;
-        $storageDir = "products/{$categorySlug}/{$productSlug}";
-
-        // Ensure directory exists
-        Storage::disk('public')->makeDirectory($storageDir);
-
-        // Copy image to storage
-        $extension = pathinfo($imageName, PATHINFO_EXTENSION);
-        $filename = "main.{$extension}";
-        $destinationPath = "{$storageDir}/{$filename}";
-
-        // Copy file
-        $imageContent = File::get($sourceImagePath);
-        Storage::disk('public')->put($destinationPath, $imageContent);
-
-        // Update product with image path
-        $product->update(['image_path' => $destinationPath]);
-
-        $this->command->info("📸 Copied image for: {$product->name}");
     }
 }
