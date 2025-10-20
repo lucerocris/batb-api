@@ -55,11 +55,7 @@ return new class extends Migration
             $table->boolean('allow_backorder')->default(false);
 
             //type
-            $table->enum('type', [
-                'premium',
-                'classic',
-            ]);
-
+            $table->string('type')->default('shirt');
             //images & meta
             $table->string('image_path')->nullable();
             $table->boolean('is_active')->default(true);
