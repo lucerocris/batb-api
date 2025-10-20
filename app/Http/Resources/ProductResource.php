@@ -32,6 +32,7 @@ class ProductResource extends JsonResource
             'trackInventory' => (bool) $this->track_inventory,
             'allowBackorder' => (bool) $this->allow_backorder,
             'type' => $this->type,
+            'brand' => $this->brand,
             'imageUrl' => $this->image_path ? asset('storage/'.$this->image_path) : null,
             'isActive' => (bool) $this->is_active,
             'isFeatured' => (bool) $this->is_featured,
