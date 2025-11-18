@@ -26,30 +26,17 @@ class ProductResource extends JsonResource
             'basePrice' => $this->base_price,
             'salePrice' => $this->sale_price,
             'costPrice' => $this->cost_price,
-            'stockQuantity' => $this->stock_quantity,
-            'reservedQuantity' => $this->reserved_quantity,
-            'lowStockThreshold' => $this->low_stock_threshold,
-            'trackInventory' => (bool) $this->track_inventory,
-            'allowBackorder' => (bool) $this->allow_backorder,
+            'stockStatus' => $this->stock_status,
             'type' => $this->type,
             'brand' => $this->brand,
             'imageUrl' => $this->image_path ? asset('storage/'.$this->image_path) : null,
             'isActive' => (bool) $this->is_active,
             'isFeatured' => (bool) $this->is_featured,
-            'availableFrom' => optional($this->available_from)->toDateTimeString(),
-            'availableUntil' => optional($this->available_until)->toDateTimeString(),
-            'metaTitle' => $this->meta_title,
-            'metaDescription' => $this->meta_description,
             'tags' => $this->tags ?? [],
-            'purchaseCount' => $this->purchase_count,
             'createdAt'=> $this->created_at,
-
             'productVariants' => ProductVariantResource::collection($this->whenLoaded('productVariants')),
             'category' => new CategoryResource($this->whenLoaded('category')),
             'orderItems' => OrderItemResource::collection($this->whenLoaded('orderItems'))
-
-
-
         ];
     }
 }

@@ -22,9 +22,7 @@ class CategoryFactory extends Factory
             'slug' => Str::slug(fake()->words(2, true)),
             'description' => fake()->sentence(),
             'image_path' => 'categories/' . fake()->randomElement(['category1.jpg', 'category2.jpg', 'category3.jpg', 'category4.jpg', 'category5.jpg']),
-            'sort_order' => fake()->numberBetween(0, 50),
             'is_active' => true,
-            'meta_data' => json_encode(['seo_title' => fake()->sentence()]),
             'created_at' => now(),
             'updated_at' => now(),
         ];

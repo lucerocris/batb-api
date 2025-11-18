@@ -18,7 +18,7 @@ class ProductFactory extends Factory
     public function definition(): array
     {
         static $index = 0;
-        
+
         $names = [
             'Lilac Hue', 'Rosy Lure', 'Vanilla Plush', 'Morose', 'Vanilla White',
             'Cherry Red', 'White Bow', 'Gold Crescent', 'Pink Sakura', 'Purple Seashell',
@@ -39,17 +39,11 @@ class ProductFactory extends Factory
             'base_price' => fake()->randomFloat(2, 100, 5000),
             'sale_price' => null,
             'cost_price' => fake()->randomFloat(2, 50, 2000),
-            'stock_quantity' => fake()->numberBetween(1, 10),
-            'reserved_quantity' => 0,
-            'low_stock_threshold' => 5,
-            'track_inventory' => true,
-            'allow_backorder' => false,
+            'stock_status' => 'available',
             'type' => fake()->randomElement(['premium', 'classic']),
             'image_path' => 'products/' . fake()->randomElement(['category1.jpg', 'category2.jpg', 'category3.jpg', 'category4.jpg', 'category5.jpg']),
             'is_active' => true,
             'is_featured' => fake()->boolean(),
-            'available_from' => now(),
-            'purchase_count' => 0,
             'created_at' => now(),
             'updated_at' => now(),
         ];

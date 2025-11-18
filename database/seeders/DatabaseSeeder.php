@@ -52,10 +52,10 @@ class DatabaseSeeder extends Seeder
                     'name' => "Size {$sizeData['size']}",
                     'type' => 'size',
                     'value' => $sizeData['size'],
-                    'stock_quantity' => 1, // Single item thrift finds
+                    'stock_status' => 'available', // single item thrift finds are available
                 ]));
 
-                $product->update(['stock_quantity' => 1]);
+                $product->update(['stock_status' => 'available']);
             }
 
             return $variants;
@@ -324,21 +324,12 @@ class DatabaseSeeder extends Seeder
             'sale_price' => null,
             'cost_price' => $productData['cost_price'],
             'original_price' => $productData['original_price'],
-            'stock_quantity' => 1,
-            'reserved_quantity' => 0,
-            'low_stock_threshold' => 1,
-            'track_inventory' => true,
-            'allow_backorder' => false,
+            'stock_status' => 'available',
             'type' => $productData['type'],
             'image_path' => null,
             'is_active' => true,
             'is_featured' => rand(0, 1) == 1,
-            'available_from' => now(),
-            'available_until' => null,
-            'meta_title' => null,
-            'meta_description' => null,
             'tags' => json_encode($productData['tags']),
-            'purchase_count' => 0,
         ]);
 
         // Handle image copying

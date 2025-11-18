@@ -45,14 +45,12 @@ return new class extends Migration
             $table->decimal('base_price', 7, 2);
             $table->decimal('sale_price', 7, 2)->nullable();
             $table->decimal('cost_price', 7, 2)->nullable();
-            $table->decimal('original_price', 7, 2)->nullable(); // Original retail price
-            $table->integer('stock_quantity')->default(0);
-            $table->integer('reserved_quantity')->default(0);
-            $table->integer('low_stock_threshold')->default(5);
+            $table->decimal('original_price', 7, 2)->nullable();
+            $table->enum('stock_status', [
+                'available',
+                'unavailable'
+            ])->default('available');
 
-            //inventory
-            $table->boolean('track_inventory')->default(true);
-            $table->boolean('allow_backorder')->default(false);
 
             //type
             $table->string('type')->default('shirt');
@@ -61,9 +59,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->boolean('is_featured')->default(false);
 
-            //availability
-            $table->timestamp("available_from")->nullable();
-            $table->timestamp('available_until')->nullable();
+
 
             //dimensions
             // $table->decimal('weight', 5, 2)->nullable();
@@ -71,14 +67,10 @@ return new class extends Migration
             // $table->decimal('length', 5, 2)->nullable();
             // $table->decimal('width', 5, 2)->nullable();
 
-            //seo & tags
-            $table->string('meta_title')->nullable();
-            $table->text('meta_description')->nullable();
             $table->json('tags')->nullable();
 
             //stats
             // $table->integer('view_count')->default(0);
-            $table->integer('purchase_count')->default(0);
             // $table->decimal('average_rating', 3, 2)->default(0);
             // $table->integer('review_count')->default(0);
 

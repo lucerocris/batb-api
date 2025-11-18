@@ -22,16 +22,15 @@ class CategoryResource extends JsonResource
             'imageUrl' => $this->image_path
                 ? asset('storage/'.$this->image_path)
                 : null,
-            'sortOrder' => $this->sort_order,
             'isActive' => $this->is_active,
-            'metaData' => $this->meta_data,
             'createdAt' => $this->created_at,
             'updatedAt' => $this->updated_at,
             'productCount' => $this->whenLoaded('products', fn () => $this->products->count(), $this->products()->count()),
             'products' => ProductResource::collection($this->whenLoaded('products')),
             'imageUrl' => $this->image_path
                 ? asset('storage/'.$this->image_path)
-                : null, 
+                : null,
         ];
     }
 }
+
