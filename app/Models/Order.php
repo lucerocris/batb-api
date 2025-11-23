@@ -32,6 +32,7 @@ class Order extends Model
         'expires_at',
         'payment_instructions',
         'payment_reference',
+        'idempotency_key',
         'subtotal',
         'tax_amount',
         'phone_number',
@@ -49,7 +50,6 @@ class Order extends Model
         'last_reminder_sent',
         'order_date',
         'tip',
-        'image_path'
     ];
 
     protected $casts = [
@@ -78,7 +78,8 @@ class Order extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function verifiedby() : BelongsTo
+    // Keep a single canonical relation name
+    public function verifiedBy() : BelongsTo
     {
         return $this->belongsTo(User::class, 'payment_verified_by');
     }

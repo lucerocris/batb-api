@@ -33,7 +33,19 @@ class OrderItemResource extends JsonResource
             'fulfillmentStatus' => $this->fulfillment_status,
             'quantityShipped' => $this->quantity_shipped,
             'quantityReturned' => $this->quantity_returned,
-            
+            'imageUrl' => $this->when(
+                $this->relationLoaded('productVariant') || $this->relationLoaded('product'),
+                function () {
+                    if ($this->relationLoaded('productVariant') && $this->productVariant?->image_path) {
+                        return asset('storage/'.$this->productVariant->image_path);
+                    }
+                    if ($this->relationLoaded('product') && $this->product?->image_path) {
+                        return asset('storage/'.$this->product->image_path);
+                    }
+                    return null;
+                }
+            ),
+
             // Nested resources
             'product' => new ProductResource($this->whenLoaded('product')),
             'order' => new OrderResource($this->whenLoaded('order')),

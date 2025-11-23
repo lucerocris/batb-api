@@ -15,11 +15,9 @@ class OrderResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-
             'orderID' => $this->id,
             'userID' => $this->user_id,
             'orderNumber' => $this->order_number,
-            'status' => $this->status,
             'fulfillmentStatus' => $this->fulfillment_status,
             'paymentStatus' => $this->payment_status,
             'paymentMethod' => $this->payment_method,
@@ -28,15 +26,11 @@ class OrderResource extends JsonResource
             'paymentVerifiedDate' => $this->payment_verified_date,
             'paymentVerifiedBy' => $this->payment_verified_by,
             'expiresAt' => $this->expires_at,
-            'paymentInstructions' => $this->payment_instructions,
             'paymentReference' => $this->payment_reference,
             'subtotal' => $this->subtotal,
-            'taxAmount' => $this->tax_amount,
             'shippingAmount' => $this->shipping_amount,
             'discountAmount' => $this->discount_amount,
             'totalAmount' => $this->total_amount,
-            'tip' => $this->tip,
-            'imageUrl' => $this->image_path ? asset('storage/'.$this->image_path) : null,
             'email'=> $this->email,
             'refundedAmount' => $this->refunded_amount,
             'currency' => $this->currency,
@@ -49,7 +43,10 @@ class OrderResource extends JsonResource
             'orderDate' => $this->order_date,
 
             'customer' => new UserResource($this->whenLoaded('user')),
+            // Also expose the verifying user resource when eager-loaded
+            'verifiedBy' => new UserResource($this->whenLoaded('verifiedBy')),
             'orderItems' => OrderItemResource::collection($this->whenLoaded('orderItems')),
+
         ];
     }
 }

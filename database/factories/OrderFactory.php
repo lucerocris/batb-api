@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Order>
  */
 class OrderFactory extends Factory
 {
@@ -17,17 +17,47 @@ class OrderFactory extends Factory
      */
     public function definition(): array
     {
-        $regions = [
-            'NCR', 'Region I', 'Region II', 'Region III', 'Region IV-A', 'Region IV-B',
-            'Region V', 'Region VI', 'Region VII', 'Region VIII', 'Region IX',
-            'Region X', 'Region XI', 'Region XII', 'CAR', 'CARAGA', 'BARMM'
+        // Sample Philippine locations for realism
+        $philippines = [
+            [
+                'region' => 'NCR',
+                'province' => 'Metro Manila',
+                'city' => 'Quezon City',
+                'barangay' => 'Batasan Hills',
+                'postal_code' => '1126',
+            ],
+            [
+                'region' => 'Region IV-A',
+                'province' => 'Cavite',
+                'city' => 'Imus',
+                'barangay' => 'Bucandala',
+                'postal_code' => '4103',
+            ],
+            [
+                'region' => 'Region VII',
+                'province' => 'Cebu',
+                'city' => 'Cebu City',
+                'barangay' => 'Lahug',
+                'postal_code' => '6000',
+            ],
+            [
+                'region' => 'Region XI',
+                'province' => 'Davao del Sur',
+                'city' => 'Davao City',
+                'barangay' => 'Matina Crossing',
+                'postal_code' => '8000',
+            ],
         ];
 
+        $place = fake()->randomElement($philippines);
+
+        // Generate realistic PH mobile number
+        $phone = '+63' . fake()->numberBetween(9000000000, 9999999999);
+
         return [
-             'id' => (string) Str::uuid(),
+            'id' => (string) Str::uuid(),
             'user_id' => null, // Set in seeder
             'order_number' => 'ORD-' . str_pad(fake()->numberBetween(1, 9999), 4, '0', STR_PAD_LEFT),
-            'status' => 'for_verification',
             'fulfillment_status' => 'pending',
             'payment_status' => 'pending',
             'payment_method' => fake()->randomElement(['gcash', 'bank_transfer']),
@@ -35,8 +65,8 @@ class OrderFactory extends Factory
             'payment_sent_date' => null,
             'payment_verified_date' => null,
             'payment_verified_by' => null,
+            'idempotency_key' => Str::uuid()->toString(),
             'expires_at' => now()->addDays(7),
-            'payment_instructions' => ['instructions' => 'Pay before due date'],
             'payment_reference' => null,
             'subtotal' => fake()->randomFloat(2, 100, 5000),
             'tax_amount' => 0,
@@ -45,21 +75,37 @@ class OrderFactory extends Factory
             'total_amount' => fake()->randomFloat(2, 100, 5000),
             'refunded_amount' => 0,
             'currency' => 'PHP',
-            'email' => fake()->email(),
+            'email' => fake()->safeEmail(),
+
+            // ✅ Matches Address type + phone
             'shipping_address' => [
-                'firstName' => fake()->firstName(),
-                'lastName' => fake()->lastName(),
-                'phoneNumber' => fake()->phoneNumber(),
-                'addressLine1' => fake()->streetAddress(),
-                'postalCode' => fake()->postcode(),
-                'city' => fake()->city(),
-                'region' => fake()->randomElement($regions)
+                'first_name' => fake()->firstName(),
+                'last_name' => fake()->lastName(),
+                'address_line_1' => fake()->streetAddress(),
+                'address_line_2' => fake()->optional()->secondaryAddress(),
+                'city' => $place['city'],
+                'province' => $place['province'],
+                'postal_code' => $place['postal_code'],
+                'barangay' => $place['barangay'],
+                'region' => $place['region'],
+                'country_code' => 'PH',
+                'phone' => $phone,
             ],
+
             'billing_address' => [
-                'addressLine1' => fake()->streetAddress(),
-                'city' => fake()->city(),
-                'region' => fake()->randomElement($regions)
+                'first_name' => fake()->firstName(),
+                'last_name' => fake()->lastName(),
+                'address_line_1' => fake()->streetAddress(),
+                'address_line_2' => fake()->optional()->secondaryAddress(),
+                'city' => $place['city'],
+                'province' => $place['province'],
+                'postal_code' => $place['postal_code'],
+                'barangay' => $place['barangay'],
+                'region' => $place['region'],
+                'country_code' => 'PH',
+                'phone' => $phone,
             ],
+
             'admin_notes' => fake()->sentence(),
             'customer_notes' => fake()->sentence(),
             'reminder_sent_count' => 0,
@@ -67,7 +113,6 @@ class OrderFactory extends Factory
             'order_date' => now(),
             'created_at' => now(),
             'updated_at' => now(),
-            'tip' => fake()->randomFloat(7, 0, 1000),
         ];
     }
 }

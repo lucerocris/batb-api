@@ -19,34 +19,25 @@ return new class extends Migration
 
             //separate order_number to show
             $table->string('order_number', 20)->unique();
-            $table->enum('status', [
-                'for_verification',
-                'payment_verified',
-                'shipped',
-                'delivered',
-                'cancelled',
-                'refunded',
-                'expired'
-            ])->default('for_verification');
-
-            $table->enum('fulfillment_status', [
-                'pending',
-                'processing',
-                'partial',
-                'fulfilled',
-                'cancelled'
-            ])->default('pending');
-
 
 
             $table->enum('payment_status', [
-                'pending',
-                'awaiting_confirmation',
-                'partial',
-                'paid',
-                'failed',
+                'pending',                  // first dawat sa order
+                'awaiting_confirmation',    // payment proof uploaded awaiting admin
+                'paid',                     // verified payment
+                'failed',                   // rejected payment
                 'refunded',
             ])->default('pending');
+
+            $table->enum('fulfillment_status', [
+                'pending',      // order created
+                'processing',   // payment verifiec
+                'fulfilled',    // bracelet completed
+                'shipped',      // out for delivery
+                'delivered',    // received
+                'cancelled',    // cancelled
+            ])->default('pending');
+
 
             $table->enum('payment_method', [
                 'gcash',
@@ -59,11 +50,10 @@ return new class extends Migration
             $table->timestamp('payment_sent_date')->nullable();
             $table->timestamp('payment_verified_date')->nullable();
             $table->timestamp('expires_at')->nullable();
-            $table->json('payment_instructions')->nullable();
             $table->string('payment_reference', 100)->nullable();
 
-            //image
-            $table->string('image_path')->nullable();
+            //idempotency-key
+            $table->string('idempotency_key');
 
             //admin confirmation
             $table->foreignUuid('payment_verified_by')
@@ -73,8 +63,8 @@ return new class extends Migration
 
             //pricing
             $table->decimal('subtotal', 8, 2)->nullable();
-            $table->decimal('tax_amount', 8, 2)->default(0.00);
-            $table->decimal('shipping_amount', 8, 2)->default(0.00);
+            $table->decimal('tax_amount', 8, 2)->default(0.00); // not used for now
+            $table->decimal('shipping_amount', 8, 2)->default(0.00)->nullable();
             $table->decimal('discount_amount', 8, 2)->default(0.00);
             $table->decimal('total_amount', 8, 2)->nullable();
             $table->decimal('refunded_amount', 8, 2)->default(0.00);
@@ -85,18 +75,16 @@ return new class extends Migration
 
 
             $table->json('shipping_address');
-            $table->json('billing_address')->nullable();
+            $table->json('billing_address')->nullable(); // not used for now
             $table->text('admin_notes')->nullable();
             $table->text('customer_notes')->nullable();
             $table->tinyInteger('reminder_sent_count')->default(0);
             $table->timestamp('last_reminder_sent')->nullable();
             $table->timestamp('order_date');
-            $table->decimal('tip', 7, 2)->nullable();
 
 
             //soft delete
             $table->softDeletes();
-
             $table->timestamps();
         });
     }

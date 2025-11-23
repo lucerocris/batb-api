@@ -12,15 +12,14 @@ class OrderCalculationService{
      */
     public function processOrderItems(array $orderItems, OrderItemAutoFillService $fill)
     {
-        return array_map(function($item) use ($fill){
-            
-            $item = $fill->fillProductData($item);
-            
-            // Calculate line total
+        // Use batch method to prevent N+1 queries
+        $processedItems = $fill->fillProductDataBatch($orderItems);
+        
+        // Calculate line totals
+        return array_map(function($item) {
             $item['line_total'] = $item['unit_price'] * $item['quantity'];
-
             return $item;
-        }, $orderItems);
+        }, $processedItems);
     }
 
      /**
@@ -43,8 +42,11 @@ class OrderCalculationService{
     /**
      * Process complete order calculations
      */
-    public function calculateOrderTotals(array $orderItems, float $shippingAmount = 0, float $taxAmount = 0, OrderItemAutoFillService $fill): array
+    public function calculateOrderTotals(array $orderItems, OrderItemAutoFillService $fill, float $shippingAmount = 0, float $taxAmount = 0): array
     {
+        // Preload product and variant data to avoid N+1 queries
+        $fill->preloadData($orderItems);
+
         $processedItems = $this->processOrderItems($orderItems, $fill);
         $subtotal = $this->calculateSubtotal($processedItems);
         $total = $this->calculateTotal($subtotal, $shippingAmount, $taxAmount);
