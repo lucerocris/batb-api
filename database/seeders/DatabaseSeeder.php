@@ -12,6 +12,7 @@ use App\Models\Address;
 use App\Models\InventoryMovement;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -22,6 +23,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Create admin user
+        User::create([
+            'id' => (string) Str::uuid(),
+            'first_name' => 'Admin',
+            'last_name' => 'User',
+            'email' => 'admin@admin.com',
+            'password' => Hash::make('admin'),
+            'role' => 'admin',
+            'email_verified_at' => now(),
+        ]);
+
         $users = User::factory(10)->create();
 
         // Create clothing categories
