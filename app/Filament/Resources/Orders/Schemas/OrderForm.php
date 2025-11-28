@@ -27,34 +27,25 @@ class OrderForm
                     ->label('Order Number')
                     ->unique(ignoreRecord: true)
                     ->maxLength(255),
-                Select::make('status')
-                    ->options([
-                        'pending' => 'Pending',
-                        'processing' => 'Processing',
-                        'completed' => 'Completed',
-                        'cancelled' => 'Cancelled',
-                        'refunded' => 'Refunded',
-                    ])
-                    ->default('pending')
-                    ->required(),
                 Select::make('fulfillment_status')
                     ->label('Fulfillment Status')
                     ->options([
-                        'unfulfilled' => 'Unfulfilled',
-                        'partially_fulfilled' => 'Partially Fulfilled',
+                        'pending' => 'Pending',
+                        'processing' => 'Processing',
                         'fulfilled' => 'Fulfilled',
                         'shipped' => 'Shipped',
                         'delivered' => 'Delivered',
+                        'cancelled' => 'Cancelled',
                     ])
                     ->default('unfulfilled'),
                 Select::make('payment_status')
                     ->label('Payment Status')
                     ->options([
                         'pending' => 'Pending',
+                        'awaiting_confirmation' => 'Awaiting Confirmation',
                         'paid' => 'Paid',
-                        'partially_paid' => 'Partially Paid',
-                        'refunded' => 'Refunded',
                         'failed' => 'Failed',
+                        'refunded' => 'Refunded',
                     ])
                     ->default('pending')
                     ->required(),
