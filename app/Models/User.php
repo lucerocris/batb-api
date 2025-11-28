@@ -103,28 +103,36 @@ class User extends Authenticatable implements FilamentUser, JWTSubject
         return $this->orders()->sum('total_amount');
     }
 
-    // Name accessor for Filament compatibility
-    public function getNameAttribute(): string
+    // // Name accessor for Filament compatibility
+    // public function getNameAttribute(): string
+    // {
+    //     if ($this->first_name && $this->last_name) {
+    //         return trim("{$this->first_name} {$this->last_name}");
+    //     }
+
+    //     if ($this->first_name) {
+    //         return $this->first_name;
+    //     }
+
+    //     if ($this->username) {
+    //         return $this->username;
+    //     }
+
+    //     return $this->email ?? 'User';
+    // }
+
+    // Filament: Display Name
+    public function getFilamentName(): string
     {
         if ($this->first_name && $this->last_name) {
-            return trim("{$this->first_name} {$this->last_name}");
-        }
-
-        if ($this->first_name) {
-            return $this->first_name;
+            return "$this->first_name $this->last_name";
         }
 
         if ($this->username) {
             return $this->username;
         }
 
-        return $this->email ?? 'User';
-    }
-
-    // Filament: Display Name
-    public function getFilamentName(): string
-    {
-        return $this->name;
+        return $this->email;
     }
 
     // REQUIRED FOR FILAMENT v3

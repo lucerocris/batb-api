@@ -3,9 +3,11 @@
 namespace App\Filament\Resources\Orders\Tables;
 
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Table;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 
 
@@ -16,20 +18,29 @@ class OrdersTable
     {
         return $table
             ->columns([
-                
-                TextColumn::make('user.name')
+                // ImageColumn::make('image_preview')
+                //     ->label('Payment Proof')
+                //     ->toggleable()
+                //     ->getStateUsing(function ($record) {
+                //         if ($record->image_path) {
+                //             return asset('storage/' . ltrim($record->image_path, '/'));
+                //         }
+
+                //         return $record->image_url;
+                //     }),
+                TextColumn::make('user.filament_name')
                         ->label('Customer')
                         ->default('Unknown User'),
                 TextColumn::make('order_number'),
                 TextColumn::make('payment_method'),
                 TextColumn::make('total_amount'),
-                
             ])
             ->filters([
                 //
             ])
             ->recordActions([
                 EditAction::make(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

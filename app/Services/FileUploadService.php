@@ -20,14 +20,45 @@ class FileUploadService
      */
     public function handleProductImage(Product $product, UploadedFile $file): ?string
     {
-        $categoryName = $product->category?->name;
-        if (!$categoryName) {
-            return null;
-        }
-
-        $directory = 'products/' . Str::slug($categoryName) . '/' . $product->slug;
+        $directory = $this->resolveProductDirectory($product);
         $filename = $this->generateProductFilename($product, $file);
         
+        return $this->uploadFileWithFixedName($file, $directory, $filename);
+    }
+
+    /**
+     * Handle gallery uploads for a Product entity.
+     *
+     * @param  array<UploadedFile>  $files
+     * @return array<int, string>
+     */
+    public function handleProductGalleryImages(Product $product, array $files): array
+    {
+        $storedPaths = [];
+
+        foreach ($files as $index => $file) {
+            if (! $file instanceof UploadedFile) {
+                continue;
+            }
+
+            $stored = $this->handleProductGalleryImage($product, $file, $index + 1);
+
+            if ($stored) {
+                $storedPaths[] = $stored;
+            }
+        }
+
+        return $storedPaths;
+    }
+
+    /**
+     * Store a single gallery image for the product.
+     */
+    public function handleProductGalleryImage(Product $product, UploadedFile $file, int $sequence = 1): ?string
+    {
+        $directory = $this->resolveProductDirectory($product) . '/gallery';
+        $filename = $this->generateProductGalleryFilename($product, $file, $sequence);
+
         return $this->uploadFileWithFixedName($file, $directory, $filename);
     }
 
@@ -111,6 +142,24 @@ class FileUploadService
     {
         $ext = $file->getClientOriginalExtension();
         return $product->slug . '.' . strtolower($ext ?: 'jpg');
+    }
+
+    private function generateProductGalleryFilename(Product $product, UploadedFile $file, int $sequence): string
+    {
+        $ext = $file->getClientOriginalExtension() ?: 'jpg';
+
+        return $product->slug . '-gallery-' . $sequence . '-' . Str::random(6) . '.' . strtolower($ext);
+    }
+
+    private function resolveProductDirectory(Product $product): string
+    {
+        $categoryName = $product->category?->name;
+
+        if (! $categoryName) {
+            return 'products/' . $product->slug;
+        }
+
+        return 'products/' . Str::slug($categoryName) . '/' . $product->slug;
     }
 
     /**
