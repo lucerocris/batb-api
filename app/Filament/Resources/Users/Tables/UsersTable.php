@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Users\Tables;
 
+use App\Livewire\UserStatistcs;
+
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -13,7 +15,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\Card;
 
 
-class UsersTable
+class UsersTable 
 {
     public static function configure(Table $table): Table
     {
@@ -29,6 +31,7 @@ class UsersTable
                     ->label('Total Orders made'),
 
             ])
+            
             ->filters([
                 TrashedFilter::make(),
             ])
@@ -42,8 +45,8 @@ class UsersTable
                     RestoreBulkAction::make(),
                 ]),
             ]);
-        Card::make()->extraAttributes(['class' => 'bg-gray-50']);
     }
+
 }
 
 

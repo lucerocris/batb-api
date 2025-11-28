@@ -25,6 +25,7 @@ class OrderResource extends Resource
         return OrderForm::configure($schema);
     }
 
+    
     public static function table(Table $table): Table
     {
         return OrdersTable::configure($table);
