@@ -15,6 +15,9 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Widgets\StatsOverviewWidget\Stat;
+
+
 
 class UserResource extends Resource
 {
@@ -38,7 +41,6 @@ class UserResource extends Resource
             //
         ];
     }
-
     public static function getPages(): array
     {
         return [
