@@ -80,7 +80,7 @@ return new class extends Migration
             $table->text('customer_notes')->nullable();
             $table->tinyInteger('reminder_sent_count')->default(0);
             $table->timestamp('last_reminder_sent')->nullable();
-            $table->timestamp('order_date');
+            $table->timestamp('order_date')->useCurrent();
 
 
             //soft delete
