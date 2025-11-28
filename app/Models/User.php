@@ -66,6 +66,10 @@ class User extends Authenticatable implements FilamentUser, JWTSubject
     {
         return [];
     }
+    public function getNameAttribute(): string
+    {
+        return trim("{$this->first_name} {$this->last_name}") ?: 'Unknown User';
+    }
 
     // Relations
     public function orders(): HasMany
