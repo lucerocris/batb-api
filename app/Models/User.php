@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -12,17 +10,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Laravel\Sanctum\HasApiTokens;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 
-class User extends Authenticatable implements JWTSubject
+class User extends Authenticatable implements FilamentUser, JWTSubject
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, SoftDeletes, HasUuids;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
 
     protected $keyType = 'string';
     public $incrementing = false;
@@ -42,24 +35,14 @@ class User extends Authenticatable implements JWTSubject
         'total_spent',
         'failed_login_attempts',
         'locked_until',
-        'image_path'
+        'image_path',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -73,17 +56,12 @@ class User extends Authenticatable implements JWTSubject
         ];
     }
 
-    /**
-     * Get the identifier that will be stored in the JWT subject claim
-     */
+    // JWT
     public function getJWTIdentifier()
     {
         return $this->getKey();
     }
 
-    /**
-     * Return a key-value array containing any custom claims to be added to JWT
-     */
     public function getJWTCustomClaims()
     {
         return [];
@@ -93,26 +71,28 @@ class User extends Authenticatable implements JWTSubject
         return trim("{$this->first_name} {$this->last_name}") ?: 'Unknown User';
     }
 
-    public function orders() : HasMany
+    // Relations
+    public function orders(): HasMany
     {
         return $this->hasMany(Order::class, 'user_id');
     }
 
-    public function ordersVerified() : HasMany
+    public function ordersVerified(): HasMany
     {
         return $this->hasMany(Order::class, 'payment_verified_by');
     }
 
-    public function addresses() : HasMany
+    public function addresses(): HasMany
     {
         return $this->hasMany(Address::class, 'user_id');
     }
 
-    public function inventoryLogs() : HasMany
+    public function inventoryLogs(): HasMany
     {
         return $this->hasMany(InventoryMovement::class, 'user_id');
     }
 
+    // Accessors
     public function getTotalOrdersAttribute(): int
     {
         return $this->orders()->count();
@@ -121,5 +101,43 @@ class User extends Authenticatable implements JWTSubject
     public function getTotalSpentAttribute(): float
     {
         return $this->orders()->sum('total_amount');
+    }
+
+    // // Name accessor for Filament compatibility
+    // public function getNameAttribute(): string
+    // {
+    //     if ($this->first_name && $this->last_name) {
+    //         return trim("{$this->first_name} {$this->last_name}");
+    //     }
+
+    //     if ($this->first_name) {
+    //         return $this->first_name;
+    //     }
+
+    //     if ($this->username) {
+    //         return $this->username;
+    //     }
+
+    //     return $this->email ?? 'User';
+    // }
+
+    // Filament: Display Name
+    public function getFilamentName(): string
+    {
+        if ($this->first_name && $this->last_name) {
+            return "$this->first_name $this->last_name";
+        }
+
+        if ($this->username) {
+            return $this->username;
+        }
+
+        return $this->email;
+    }
+
+    // REQUIRED FOR FILAMENT v3
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->role === 'admin';
     }
 }

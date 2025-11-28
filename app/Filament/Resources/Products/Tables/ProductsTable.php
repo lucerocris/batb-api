@@ -3,13 +3,14 @@
 namespace App\Filament\Resources\Products\Tables;
 
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
-
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 
 
@@ -19,20 +20,28 @@ class ProductsTable
     {
         return $table
             ->columns([
-                
-                TextColumn::make('stock_status'),
+                ImageColumn::make('image_preview')
+                    ->label('Image')
+                    ->getStateUsing(function ($record) {
+                        if ($record->image_path) {
+                            return asset('storage/' . ltrim($record->image_path, '/'));
+                        }
 
+                        return $record->image_url;
+                    }),
+                TextColumn::make('stock_status'),
                 TextColumn::make('name'),
-            
                 TextColumn::make('sku'),
-                
-                TextColumn::make('cost_price'),
+                TextColumn::make('cost_price')
+                    ->label('Cost Price')
+                    ->formatStateUsing(fn ($state) => $state ? '$' . number_format($state, 2) : '—'),
             ])
             ->filters([
                 TrashedFilter::make(),
             ])
             ->recordActions([
                 EditAction::make(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

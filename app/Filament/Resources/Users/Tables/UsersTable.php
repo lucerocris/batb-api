@@ -3,12 +3,14 @@
 namespace App\Filament\Resources\Users\Tables;
 
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\Card;
 
@@ -19,6 +21,17 @@ class UsersTable
     {
         return $table
             ->columns([
+                // ImageColumn::make('image_preview')
+                //     ->label('Avatar')
+                //     ->circular()
+                //     ->height(45)
+                //     ->getStateUsing(function ($record) {
+                //         if ($record->image_path) {
+                //             return asset('storage/' . ltrim($record->image_path, '/'));
+                //         }
+
+                //         return $record->image_url;
+                //     }),
                 TextColumn::make('role')->sortable(),
                 TextColumn::make('first_name')->sortable(),
                 TextColumn::make('last_name')->sortable(),
@@ -34,6 +47,7 @@ class UsersTable
             ])
             ->recordActions([
                 EditAction::make(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
@@ -42,7 +56,7 @@ class UsersTable
                     RestoreBulkAction::make(),
                 ]),
             ]);
-        Card::make()->extraAttributes(['class' => 'bg-gray-50']);
+        // Card::make()->extraAttributes(['class' => 'bg-gray-50']);
     }
 }
 
