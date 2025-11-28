@@ -88,6 +88,10 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
+    public function getNameAttribute(): string
+    {
+        return trim("{$this->first_name} {$this->last_name}") ?: 'Unknown User';
+    }
 
     public function orders() : HasMany
     {
