@@ -27,6 +27,11 @@ class ProductsTable
                 TextColumn::make('sku'),
                 
                 TextColumn::make('cost_price'),
+
+                TextColumn::make('is_active')
+                ->label('Status')
+                ->formatStateUsing(fn ($state) => $state ? 'Active' : 'Inactive'),
+
             ])
             ->filters([
                 TrashedFilter::make(),
