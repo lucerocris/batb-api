@@ -7,11 +7,15 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
 
+use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Section;
 class UserForm
 {
     public static function configure(Schema $schema): Schema
     {
+     
         return $schema
             ->components([
                 TextInput::make('first_name')
@@ -71,3 +75,27 @@ class UserForm
             ]);
     }
 }
+
+
+/*
+
+  protected $fillable = [
+        'id',
+        'first_name',
+        'last_name',
+        'email',
+        'email_verified_at',
+        'password',
+        'role',
+        'phone_number',
+        'date_of_birth',
+        'username',
+        'total_orders',
+        'total_spent',
+        'failed_login_attempts',
+        'locked_until',
+        'image_path'
+    ];
+
+    /**
+*/

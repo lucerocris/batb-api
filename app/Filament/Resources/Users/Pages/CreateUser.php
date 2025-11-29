@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Users\Pages;
 use App\Filament\Resources\Users\UserResource;
 use App\Services\FileUploadService;
 use Filament\Resources\Pages\CreateRecord;
+use Filament\Forms\Components\TextInput;
 use Illuminate\Support\Facades\Hash;
 
 class CreateUser extends CreateRecord

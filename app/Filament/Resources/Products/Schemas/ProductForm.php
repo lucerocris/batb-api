@@ -15,6 +15,7 @@ class ProductForm
 {
     public static function configure(Schema $schema): Schema
     {
+             
         return $schema
             ->components([
                 Select::make('category_id')
@@ -92,3 +93,28 @@ class ProductForm
             ]);
     }
 }
+
+
+/*
+'id',
+        'category_id',
+        'name',
+        'slug',
+        'description',
+        'short_description',
+        'sku',
+        'base_price',
+        'sale_price',
+        'cost_price',
+        'stock_status',
+        'type',
+        'image_path',
+        'is_active',
+        'is_featured',
+        'available_from',
+        'weight',
+        'view_count',
+        'purchase_count',
+        'average_rating',
+        'review_count',
+*/
