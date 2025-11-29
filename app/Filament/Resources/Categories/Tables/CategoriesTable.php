@@ -53,7 +53,6 @@ class CategoriesTable
     }
 }
 
-
 /*
      use HasFactory, SoftDeletes;
 
@@ -71,8 +70,4 @@ class CategoriesTable
         'is_active' => 'boolean',
         'meta_data' => 'array',
     ];
-
-
-
-
 */

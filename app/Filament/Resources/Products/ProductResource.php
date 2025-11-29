@@ -39,6 +39,12 @@ class ProductResource extends Resource
             //
         ];
     }
+    public static function getWidgets(): array
+    {
+        return [
+            \App\Filament\Resources\Products\Widgets\ProductStats::class,
+        ];
+    }
 
     public static function getPages(): array
     {

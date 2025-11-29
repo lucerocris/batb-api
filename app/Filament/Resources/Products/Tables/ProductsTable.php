@@ -35,10 +35,14 @@ class ProductsTable
                     }),
                 TextColumn::make('stock_status'),
                 TextColumn::make('name'),
-                TextColumn::make('sku'),
+                TextColumn::make('sku'),         
+                TextColumn::make('is_active')
+                ->label('Status')
+                ->formatStateUsing(fn ($state) => $state ? 'Active' : 'Inactive'),
                 TextColumn::make('cost_price')
                     ->label('Cost Price')
-                    ->formatStateUsing(fn($state) => $state ? '$' . number_format($state, 2) : '—'),
+                    ->formatStateUsing(fn ($state) => $state ? '$' . number_format($state, 2) : '—'),
+
             ])
             ->filters([
                 TrashedFilter::make(),
