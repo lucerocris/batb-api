@@ -36,7 +36,7 @@ class OrderResource extends Resource
         return OrderForm::configure($schema);
     }
 
-    
+
     public static function table(Table $table): Table
     {
         return OrdersTable::configure($table);
@@ -169,7 +169,16 @@ class OrderResource extends Resource
                                     ]),
 
                             ]),
+
+                        Section::make('Payment Information')
+                        ->schema([
+                            Infolists\Components\ImageEntry::make('payment_proof')
+                                ->label('Payment Proof')
+                                ->placeholder('No payment proof uploaded.')
+                                ->maxWidth(300),
+                        ])
                     ])->columnSpan(2),
+
 
                     Group::make([
                         // Order Details Section
