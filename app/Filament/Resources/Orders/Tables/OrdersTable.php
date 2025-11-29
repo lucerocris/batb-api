@@ -8,6 +8,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 
@@ -29,12 +30,42 @@ class OrdersTable
 
                 //         return $record->image_url;
                 //     }),
-                TextColumn::make('user.filament_name')
-                        ->label('Customer')
-                        ->default('Unknown User'),
+                TextColumn::make('shipping_address')
+                    ->label('Customer')
+                    ->getStateUsing(function ($record) {
+                        $address = is_array($record->shipping_address) ? $record->shipping_address : json_decode($record->shipping_address, true);
+                        $firstName = $address['first_name'] ?? '';
+                        $lastName = $address['last_name'] ?? '';
+                        return trim("$firstName $lastName") ?: 'Unknown User';
+                    }),
                 TextColumn::make('order_number'),
-                TextColumn::make('payment_method'),
-                TextColumn::make('total_amount'),
+                TextColumn::make('payment_method')
+                    ->formatStateUsing(fn(string $state) => str($state)->replace('_', ' ')->title()),
+                TextColumn::make('payment_status')
+                    ->label('Payment Status')
+                    ->badge()
+                    ->formatStateUsing(fn(string $state): string => str($state)->headline())
+                    ->color(fn(string $state): string => match ($state) {
+                        'paid' => 'success',
+                        'awaiting_confirmation' => 'warning',
+                        'pending' => 'gray',
+                        'failed' => 'danger',
+                        'refunded' => 'info',
+                        default => 'gray',
+                    }),
+                TextColumn::make('fulfillment_status')
+                    ->label('Fulfillment')
+                    ->badge()
+                    ->formatStateUsing(fn(string $state): string => str($state)->headline())
+                    ->color(fn(string $state): string => match ($state) {
+                        'delivered' => 'success',
+                        'shipped' => 'info',
+                        'processing' => 'warning',
+                        'fulfilled' => 'primary',
+                        'cancelled' => 'danger',
+                        default => 'gray',
+                    }),
+                TextColumn::make('total_amount')->money('php'),
 
             ])
             ->filters([
