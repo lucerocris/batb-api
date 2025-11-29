@@ -2,12 +2,16 @@
 
 namespace App\Filament\Resources\Products\Tables;
 
+use App\Filament\Resources\Products\Pages\ViewProduct;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\ImageColumn;
@@ -34,14 +38,17 @@ class ProductsTable
                 TextColumn::make('sku'),
                 TextColumn::make('cost_price')
                     ->label('Cost Price')
-                    ->formatStateUsing(fn ($state) => $state ? '$' . number_format($state, 2) : '—'),
+                    ->formatStateUsing(fn($state) => $state ? '$' . number_format($state, 2) : '—'),
             ])
             ->filters([
                 TrashedFilter::make(),
             ])
             ->recordActions([
-                EditAction::make(),
-                DeleteAction::make(),
+                ViewAction::make(),
+                ActionGroup::make([
+                    EditAction::make(),
+                    DeleteAction::make(),
+                ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

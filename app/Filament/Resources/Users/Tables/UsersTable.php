@@ -4,6 +4,8 @@ namespace App\Filament\Resources\Users\Tables;
 
 use App\Livewire\UserStatistcs;
 
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -17,7 +19,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\Card;
 
 
-class UsersTable 
+class UsersTable
 {
     public static function configure(Table $table): Table
     {
@@ -44,13 +46,14 @@ class UsersTable
                     ->label('Total Orders made'),
 
             ])
-            
             ->filters([
                 TrashedFilter::make(),
             ])
             ->recordActions([
-                EditAction::make(),
-                DeleteAction::make(),
+                ActionGroup::make([
+                    EditAction::make(),
+                    DeleteAction::make(),
+                ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
