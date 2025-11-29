@@ -7,15 +7,12 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
-
-use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Section;
 class UserForm
 {
     public static function configure(Schema $schema): Schema
     {
-     
+
         return $schema
             ->components([
                 TextInput::make('first_name')
