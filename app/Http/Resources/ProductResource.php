@@ -30,6 +30,9 @@ class ProductResource extends JsonResource
             'type' => $this->type,
             'brand' => $this->brand,
             'imageUrl' => $this->image_path ? asset('storage/'.$this->image_path) : null,
+            'imageGallery' => collect($this->gallery_images ?? [])
+                ->map(fn ($path) => asset('storage/' . ltrim($path, '/')))
+                ->all(),
             'isActive' => (bool) $this->is_active,
             'isFeatured' => (bool) $this->is_featured,
             'tags' => $this->tags ?? [],
