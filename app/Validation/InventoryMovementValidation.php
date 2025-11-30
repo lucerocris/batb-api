@@ -27,7 +27,7 @@ class InventoryMovementValidation{
             'product_variant_id' => 'nullable|integer|exists:product_variants,id',
             'order_id' => 'nullable|uuid|exists:orders,id',
             'user_id' => 'nullable|uuid|exists:users,id',
-            'type' => 'required|in:restock,lost,damaged,correction,other,creation',
+            'type' => 'required|in:restock,lost,damaged,correction,other,purchase',
             "adjustment_type" => 'required|string|in:increase,decrease',
             'quantity' => 'required|integer',
             'initial_quantity' => 'required|integer',

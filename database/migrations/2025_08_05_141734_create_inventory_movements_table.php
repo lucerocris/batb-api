@@ -37,7 +37,8 @@ return new class extends Migration
                 'damaged',
                 'correction',
                 'other',
-                'creation'
+                'creation',
+                'purchase'
             ]);
 
 

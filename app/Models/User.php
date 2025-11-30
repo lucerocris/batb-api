@@ -140,4 +140,13 @@ class User extends Authenticatable implements FilamentUser, JWTSubject
     {
         return $this->role === 'admin';
     }
+
+
+    /**
+     * Get the cart items for the user.
+     */
+    public function carts(): HasMany
+    {
+        return $this->hasMany(Cart::class);
+    }
 }

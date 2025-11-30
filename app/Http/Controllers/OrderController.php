@@ -143,58 +143,13 @@ class OrderController extends Controller
 
             $order = Order::create($orderData);
 
+
             $calculations = $orderCalculationService->calculateOrderTotals(
                 $orderData['order_items'],
                 $orderItemAutoFillService,
                 $orderData['shipping_amount'] ?? 0.0,
                 $orderData['tax_amount'] ?? 0.0
             );
-
-            // Build design snapshot bundles from processed items
-            $designMeta = collect($orderData['designs'] ?? [])
-                ->filter(fn($d) => !empty($d['design_key']))
-                ->keyBy('design_key');
-
-            $processed = collect($calculations['processed_items']);
-
-            $designBundles = $processed
-                ->filter(fn($i) => !empty($i['design_key']))
-                ->groupBy('design_key')
-                ->map(function ($group, $designKey) use ($designMeta) {
-                    $first = $group->first();
-                    $meta = $designMeta->get($designKey);
-
-                    // Derive bundle quantity and price
-                    $bundleQuantity = min(...$group->pluck('quantity')->all());
-                    $bundlePrice = $group->sum(fn($i) => (float)($i['unit_price'] ?? 0));
-
-                    // Name & image resolution
-                    $fallbackName = trim(($first['product_name'] ?? '') . (isset($first['variant_name']) ? ' - ' . $first['variant_name'] : '')) ?: ('Design ' . Str::substr($designKey, 0, 6));
-                    $name = $meta['name'] ?? $fallbackName;
-                    $image = $meta['image_url'] ?? ($first['image_url'] ?? null);
-
-                    return [
-                        'design_key' => $designKey,
-                        'name' => $name,
-                        'image_url' => $image,
-                        'bundle_quantity' => $bundleQuantity,
-                        'bundle_price' => round($bundlePrice, 2),
-                        'items' => $group->map(function ($i) {
-                            $itemName = trim(($i['product_name'] ?? '') . (isset($i['variant_name']) ? ' - ' . $i['variant_name'] : '')) ?: null;
-                            return [
-                                'product_id' => $i['product_id'],
-                                'product_variant_id' => $i['product_variant_id'] ?? null,
-                                'role' => $i['component_role'] ?? null,
-                                'quantity' => $i['quantity'],
-                                'unit_price' => (float)($i['unit_price'] ?? 0),
-                                'name' => $itemName,
-                                'image_url' => $i['image_url'] ?? null,
-                            ];
-                        })->values()->all(),
-                    ];
-                })
-                ->values()
-                ->all();
 
             // Batch insert order items for better performance
             $orderItemsData = [];
@@ -238,10 +193,6 @@ class OrderController extends Controller
                 'total_amount' => $calculations['total']
             ];
 
-            if (!empty($designBundles)) {
-                $updateData['designs'] = $designBundles;
-            }
-
             $storedPath = null;
             if ($request->hasFile('image')) {
                 $storedPath = $fileUploadService->handleOrderPaymentImage($order, $request->file('image'));
@@ -268,7 +219,6 @@ class OrderController extends Controller
             ]);
         });
     }
-
 
 
     /**

@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
-     use HasFactory, HasUuids, SoftDeletes;
+    use HasFactory, HasUuids, SoftDeletes;
 
     // If the primary key is a UUID instead of auto-increment
     protected $keyType = 'string';
@@ -66,7 +66,7 @@ class Product extends Model
 
     public function updateStockFromVariants()
     {
-        if($this->productVariants()->exists()){
+        if ($this->productVariants()->exists()) {
             $this->stock_quantity = $this->productVariants()->sum('stock_quantity');
             $this->save();
         }
@@ -88,23 +88,33 @@ class Product extends Model
     }
 
     //
-    public function orderItems() : HasMany
+    public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class, 'product_id');
     }
 
-    public function category() : BelongsTo
+    public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'category_id');
     }
 
-    public function productVariants() : HasMany
+    public function productVariants(): HasMany
     {
         return $this->hasMany(ProductVariant::class, 'product_id');
     }
 
-    public function inventoryLogs() : HasMany
+    public function inventoryLogs(): HasMany
     {
         return $this->hasMany(InventoryMovement::class, 'product_id');
     }
+
+    /**
+     * Get cart items for this product.
+     */
+    public function carts(): HasMany
+    {
+        return $this->hasMany(Cart::class);
+    }
+
+
 }

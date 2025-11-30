@@ -55,6 +55,9 @@ return new class extends Migration
             //idempotency-key
             $table->string('idempotency_key');
 
+            //image
+            $table->string('image_path')->nullable();
+
             //admin confirmation
             $table->foreignUuid('payment_verified_by')
                 ->nullable()

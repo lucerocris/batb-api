@@ -6,6 +6,7 @@ use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
+use App\Http\Controllers\CartController;
 
 /*Route::get('/user', function (Request $request) {
     return $request->user();
@@ -43,6 +44,14 @@ Route::prefix('admin')->group(function(){
     Route::get('/categories/{category}/restore', [CategoryController::class, 'restoreCategory']);
 
 });
+
+
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
+Route::put('/cart/{id}', [CartController::class, 'update'])->name('cart.update');
+Route::delete('/cart/{id}', [CartController::class, 'destroy'])->name('cart.destroy');
+Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
+Route::get('/cart/count', [CartController::class, 'count'])->name('cart.count');
 
 Route::prefix('export')->group(function() {
     Route::get('/products', [ExportController::class, 'exportProducts']);
