@@ -24,6 +24,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Table;
 use Filament\Infolists\Components\TextEntry;
+use Tiptap\Nodes\Text;
 
 class OrderResource extends Resource
 {
@@ -171,10 +172,20 @@ class OrderResource extends Resource
 
                         Section::make('Payment Information')
                         ->schema([
-                            Infolists\Components\ImageEntry::make('payment_proof')
+                            Infolists\Components\ImageEntry::make('image_path')
                                 ->label('Payment Proof')
                                 ->placeholder('No payment proof uploaded.')
-                                ->maxWidth(300),
+                                ->getStateUsing(function ($record) {
+                                    if ($record->image_path) {
+                                        return asset('storage/' . ltrim($record->image_path, '/'));
+                                    }
+
+                                    return $record->image_url;
+                                })
+                                ->maxWidth(500),
+                            TextEntry::make('payment_reference')
+                                ->label('Payment Reference')
+                                ->copyable(),
                         ])
                     ])->columnSpan(2),
 

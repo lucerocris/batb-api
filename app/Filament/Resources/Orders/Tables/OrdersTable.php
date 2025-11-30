@@ -34,8 +34,8 @@ class OrdersTable
                     ->label('Customer')
                     ->getStateUsing(function ($record) {
                         $address = is_array($record->shipping_address) ? $record->shipping_address : json_decode($record->shipping_address, true);
-                        $firstName = $address['first_name'] ?? '';
-                        $lastName = $address['last_name'] ?? '';
+                        $firstName = $address['firstName'] ?? '';
+                        $lastName = $address['lastName'] ?? '';
                         return trim("$firstName $lastName") ?: 'Unknown User';
                     }),
                 TextColumn::make('order_number'),

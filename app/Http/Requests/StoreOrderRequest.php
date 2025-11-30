@@ -114,6 +114,7 @@ class StoreOrderRequest extends FormRequest
             'fulfillment_status' => $data['fulfillmentStatus'],
             'payment_status' => $data['paymentStatus'],
             'payment_method' => $data['paymentMethod'],
+            'payment_reference' => $data['paymentReference'] ?? null,
             'email' => $data['email'],
             'expires_at' => $data['expiresAt'] ?? null,
             'order_date' => $data['orderDate'],
