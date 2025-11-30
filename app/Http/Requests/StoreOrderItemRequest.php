@@ -5,7 +5,6 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Product;
-use App\Models\ProductVariant;
 use Illuminate\Support\Facades\Log;
 
 class StoreOrderItemRequest extends FormRequest
@@ -28,7 +27,6 @@ class StoreOrderItemRequest extends FormRequest
         return [
             'orderId' => 'required|uuid|exists:orders,id',
             'productId' => 'required|uuid|exists:products,id',
-            'productVariantId' => 'nullable|integer|exists:product_variants,id',
             'productName' => 'required|string|max:255',
             'productSku' => 'required|string|max:255',
             'variantName' => 'nullable|string|max:255',
@@ -48,7 +46,6 @@ class StoreOrderItemRequest extends FormRequest
              */
             'orderItems' => 'required|array|min:1',
             'orderItems.*.productId' => 'required|uuid|exists:products,id',
-            'orderItems.*.productVariantId' => 'nullable|uuid|exists:product_variants,id',
             'orderItems.*.quantity' => 'required|integer|min:1',
         ];
     }
@@ -59,7 +56,6 @@ class StoreOrderItemRequest extends FormRequest
         $snake = [
             'order_id' => $data['orderId'] ?? null,
             'product_id' => $data['productId'] ?? null,
-            'product_variant_id' => $data['productVariantId'] ?? null,
             'product_name' => $data['productName'] ?? null,
             'product_sku' => $data['productSku'] ?? null,
             'variant_name' => $data['variantName'] ?? null,
@@ -81,7 +77,6 @@ class StoreOrderItemRequest extends FormRequest
             $snake['order_items'] = collect($data['orderItems'])->map(function ($item) {
                 return [
                     'product_id' => $item['productId'] ?? null,
-                    'product_variant_id' => $item['productVariantId'] ?? null,
                     'quantity' => $item['quantity'] ?? null,
                     'unit_price' => $item['unitPrice'] ?? null,
                 ];

@@ -9,9 +9,7 @@ class ProductCreationService
 {
     public function __construct(
         private FileUploadService $fileUploadService,
-        private InventoryMovementService $inventoryService,
-        private ProductVariantService $variantService,
-        private OriginalProductService $originalService
+        private InventoryMovementService $inventoryService
     ) {}
 
     /**
@@ -24,11 +22,6 @@ class ProductCreationService
             
             $this->logProductInventory($product);
             $this->handleProductImage($product, $productData['image'] ?? null);
-            
-            if (!empty($variantsData)) {
-                $this->originalService->makeOriginalVariant($product);
-                $this->variantService->createVariantsForNewProduct($product, $variantsData);
-            }
             
             return $product;
         });

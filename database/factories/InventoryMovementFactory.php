@@ -22,7 +22,6 @@ class InventoryMovementFactory extends Factory
 
         return [
             'product_id' => null, // Set in seeder
-            'product_variant_id' => null,
             'order_id' => null,
             'user_id' => null,
             'type' => fake()->randomElement(['restock', 'creation', 'lost', 'damaged', 'other', 'correction']),
