@@ -37,8 +37,8 @@ class StoreOrderRequest extends FormRequest
             // Store Order Request
             'userId' => 'nullable|uuid|exists:users,id',
             'orderNumber' => 'required|string|max:20|unique:orders,order_number',
-            'fulfillmentStatus' => 'required|in:pending,processing,fulfilled,shipped,delivered,cancelled',
-            'paymentStatus' => 'required|in:pending,awaiting_confirmation,paid,failed,refunded',
+            'fulfillmentStatus' => 'required|in:pending,fulfilled,shipped,delivered,cancelled',
+            'paymentStatus' => 'required|in:pending,paid,failed,refunded',
             'paymentMethod' => 'required|in:bank_transfer,gcash',
             'email' => 'required|string|max:100',
             'expiresAt' => 'nullable|date',

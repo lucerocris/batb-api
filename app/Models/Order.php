@@ -100,4 +100,131 @@ class Order extends Model
      *
      */
 
+    /**
+     * Accept payment proof and update statuses accordingly
+     * 
+     * @param string|null $verifiedBy User ID of the admin who verified the payment
+     * @return bool
+     */
+    public function acceptPayment(?string $verifiedBy = null): bool
+    {
+        if ($this->payment_status !== 'pending') {
+            throw new \Exception("Payment can only be accepted when status is 'pending'");
+        }
+
+        $this->payment_status = 'paid';
+        $this->fulfillment_status = 'fulfilled';
+        $this->payment_verified_date = now();
+        
+        if ($verifiedBy) {
+            $this->payment_verified_by = $verifiedBy;
+        }
+
+        return $this->save();
+    }
+
+    /**
+     * Reject payment proof and update statuses accordingly
+     * 
+     * @param string|null $verifiedBy User ID of the admin who rejected the payment
+     * @return bool
+     */
+    public function rejectPayment(?string $verifiedBy = null): bool
+    {
+        if ($this->payment_status !== 'pending') {
+            throw new \Exception("Payment can only be rejected when status is 'pending'");
+        }
+
+        $this->payment_status = 'failed';
+        $this->fulfillment_status = 'cancelled';
+        $this->payment_verified_date = now();
+        
+        if ($verifiedBy) {
+            $this->payment_verified_by = $verifiedBy;
+        }
+
+        return $this->save();
+    }
+
+    /**
+     * Progress fulfillment status
+     * Only allows progression when payment_status is 'paid'
+     * 
+     * @param string $newStatus The new fulfillment status
+     * @return bool
+     */
+    public function progressFulfillment(string $newStatus): bool
+    {
+        $allowedStatuses = ['fulfilled', 'shipped', 'delivered'];
+        
+        if (!in_array($newStatus, $allowedStatuses)) {
+            throw new \Exception("Invalid fulfillment status: {$newStatus}");
+        }
+
+        if ($this->payment_status !== 'paid') {
+            throw new \Exception("Fulfillment can only progress when payment_status is 'paid'");
+        }
+
+        // Ensure status progression is sequential
+        $statusOrder = ['pending' => 0, 'fulfilled' => 1, 'shipped' => 2, 'delivered' => 3];
+        $currentOrder = $statusOrder[$this->fulfillment_status] ?? -1;
+        $newOrder = $statusOrder[$newStatus] ?? -1;
+
+        if ($newOrder <= $currentOrder) {
+            throw new \Exception("Cannot regress fulfillment status. Current: {$this->fulfillment_status}, Attempted: {$newStatus}");
+        }
+
+        $this->fulfillment_status = $newStatus;
+        return $this->save();
+    }
+
+    /**
+     * Handle refund and update statuses
+     * 
+     * @param float|null $refundedAmount The amount to refund
+     * @return bool
+     */
+    public function processRefund(?float $refundedAmount = null): bool
+    {
+        if ($this->payment_status !== 'paid') {
+            throw new \Exception("Refunds can only be processed when payment_status is 'paid'");
+        }
+
+        $this->payment_status = 'refunded';
+        
+        if ($refundedAmount !== null) {
+            $this->refunded_amount = $refundedAmount;
+        } else {
+            // Default to full refund if amount not specified
+            $this->refunded_amount = $this->total_amount ?? 0;
+        }
+
+        // Cancel fulfillment if order was not yet delivered
+        if (!in_array($this->fulfillment_status, ['delivered', 'cancelled'])) {
+            $this->fulfillment_status = 'cancelled';
+        }
+
+        return $this->save();
+    }
+
+    /**
+     * Check if fulfillment can be progressed
+     * 
+     * @return bool
+     */
+    public function canProgressFulfillment(): bool
+    {
+        return $this->payment_status === 'paid' 
+            && !in_array($this->fulfillment_status, ['delivered', 'cancelled']);
+    }
+
+    /**
+     * Check if payment can be reviewed (accepted or rejected)
+     * 
+     * @return bool
+     */
+    public function canReviewPayment(): bool
+    {
+        return $this->payment_status === 'pending';
+    }
 }

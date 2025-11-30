@@ -73,6 +73,8 @@ Route::group(['middleware' => ['auth:api']], function () {
 });
 
 Route::apiResource('orders', OrderController::class);
+Route::post('orders/{order}/review-payment', [OrderController::class, 'reviewPaymentProof']);
+Route::put('orders/{order}/fulfillment-status', [OrderController::class, 'updateFulfillmentStatus']);
 Route::apiResource('users', UserController::class);
 
 Route::apiResource('products', ProductController::class)->except(['update']);
@@ -80,6 +82,5 @@ Route::post("/products/{product}", [ProductController::class, "update"]);
 Route::apiResource('addresses', AddressController::class);
 
 Route::apiResource('order-items', OrderItemController::class);
-Route::apiResource('product-variants', ProductVariantController::class);
 Route::apiResource('categories', CategoryController::class);
 Route::apiResource('inventory-movements', InventoryMovementController::class);

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderReceiptMail;
 use App\Mail\AdminOrderNotificationMail;
 use App\Http\Requests\UpdateOrderRequest;
+use App\Http\Requests\PaymentProofReviewRequest;
 use App\Services\OrderNumberGenerator;
 use App\Models\OrderItem;
 use App\Services\FileUploadService;
@@ -351,6 +352,93 @@ class OrderController extends Controller
         $order->delete();
 
         return response()->json(['message' => 'Order successfully deleted']);
+    }
+
+    /**
+     * Review payment proof (accept or reject)
+     * 
+     * @param PaymentProofReviewRequest $request
+     * @param Order $order
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function reviewPaymentProof(PaymentProofReviewRequest $request, Order $order)
+    {
+        try {
+            // Check if payment can be reviewed
+            if (!$order->canReviewPayment()) {
+                return response()->json([
+                    'message' => 'Payment cannot be reviewed. Current payment status: ' . $order->payment_status
+                ], 422);
+            }
+
+            $action = $request->input('action');
+            $adminNotes = $request->input('adminNotes');
+            
+            // Get the authenticated user (admin) who is reviewing
+            $verifiedBy = auth()->id();
+
+            DB::transaction(function () use ($order, $action, $adminNotes, $verifiedBy) {
+                if ($action === 'accept') {
+                    $order->acceptPayment($verifiedBy);
+                } elseif ($action === 'reject') {
+                    $order->rejectPayment($verifiedBy);
+                }
+
+                // Update admin notes if provided
+                if ($adminNotes !== null) {
+                    $order->admin_notes = $adminNotes;
+                    $order->save();
+                }
+            });
+
+            $order->refresh();
+            $order->load('verifiedBy');
+
+            return response()->json([
+                'message' => "Payment proof {$action}ed successfully",
+                'order' => new OrderResource($order)
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to review payment proof',
+                'error' => $e->getMessage()
+            ], 422);
+        }
+    }
+
+    /**
+     * Update fulfillment status
+     * Only allows progression when payment_status is 'paid'
+     * 
+     * @param Request $request
+     * @param Order $order
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateFulfillmentStatus(Request $request, Order $order)
+    {
+        $request->validate([
+            'fulfillmentStatus' => 'required|in:fulfilled,shipped,delivered'
+        ]);
+
+        try {
+            $newStatus = $request->input('fulfillmentStatus');
+            $order->progressFulfillment($newStatus);
+
+            $order->refresh();
+            $order->load('orderItems');
+
+            return response()->json([
+                'message' => 'Fulfillment status updated successfully',
+                'order' => new OrderResource($order)
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to update fulfillment status',
+                'error' => $e->getMessage()
+            ], 422);
+        }
     }
 }
 

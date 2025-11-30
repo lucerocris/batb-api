@@ -31,18 +31,16 @@ class OrderForm
                     ->label('Fulfillment Status')
                     ->options([
                         'pending' => 'Pending',
-                        'processing' => 'Processing',
                         'fulfilled' => 'Fulfilled',
                         'shipped' => 'Shipped',
                         'delivered' => 'Delivered',
                         'cancelled' => 'Cancelled',
                     ])
-                    ->default('unfulfilled'),
+                    ->default('pending'),
                 Select::make('payment_status')
                     ->label('Payment Status')
                     ->options([
                         'pending' => 'Pending',
-                        'awaiting_confirmation' => 'Awaiting Confirmation',
                         'paid' => 'Paid',
                         'failed' => 'Failed',
                         'refunded' => 'Refunded',

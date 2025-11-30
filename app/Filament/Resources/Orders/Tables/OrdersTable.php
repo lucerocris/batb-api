@@ -47,7 +47,6 @@ class OrdersTable
                     ->formatStateUsing(fn(string $state): string => str($state)->headline())
                     ->color(fn(string $state): string => match ($state) {
                         'paid' => 'success',
-                        'awaiting_confirmation' => 'warning',
                         'pending' => 'gray',
                         'failed' => 'danger',
                         'refunded' => 'info',
@@ -60,8 +59,8 @@ class OrdersTable
                     ->color(fn(string $state): string => match ($state) {
                         'delivered' => 'success',
                         'shipped' => 'info',
-                        'processing' => 'warning',
                         'fulfilled' => 'primary',
+                        'pending' => 'gray',
                         'cancelled' => 'danger',
                         default => 'gray',
                     }),

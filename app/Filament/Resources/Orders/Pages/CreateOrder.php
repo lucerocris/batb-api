@@ -25,6 +25,9 @@ class CreateOrder extends CreateRecord
         if (empty($data['payment_status'])) {
             $data['payment_status'] = 'pending';
         }
+        if (empty($data['fulfillment_status'])) {
+            $data['fulfillment_status'] = 'pending';
+        }
         if (empty($data['currency'])) {
             $data['currency'] = 'USD';
         }
