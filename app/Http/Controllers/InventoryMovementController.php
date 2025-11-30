@@ -17,7 +17,7 @@ class InventoryMovementController extends Controller
      */
     public function index()
     {
-        $movements = InventoryMovement::with(['user','order','product', 'productVariant'])->get();
+        $movements = InventoryMovement::with(['user','order','product'])->get();
 
         return InventoryMovementResource::collection($movements);
     }

@@ -17,9 +17,6 @@ return new class extends Migration
                 ->constrained('products')
                 ->onDelete('restrict');
 
-            $table->unsignedBigInteger('product_variant_id')
-                  ->nullable();
-
             $table->foreignUuid('order_id')
                 ->nullable()
                 ->constrained('orders')
@@ -47,11 +44,6 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->string('reference', 255)->nullable();
             $table->json('meta_data')->nullable();
-
-            $table->foreign('product_variant_id')
-                ->references('id')
-                ->on('product_variants')
-                ->onDelete('restrict');
 
             $table->softDeletes();
 

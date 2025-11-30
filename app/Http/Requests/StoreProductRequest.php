@@ -57,16 +57,6 @@ class StoreProductRequest extends FormRequest
             'tags' => 'nullable|array',
             'tags.*' => 'string',
 
-            'productVariants' => 'nullable|array',
-            'productVariants.*.name' => 'required|string|max:255',
-            'productVariants.*.priceAdjustment' => 'numeric|min:0',
-            'productVariants.*.stockQuantity' => 'integer|min:0',
-            'productVariants.*.reservedQuantity' => 'integer|min:0',
-            'productVariants.*.attributes' => 'array',
-            'productVariants.*.attributes.*' => 'string',
-            'productVariants.*.image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'productVariants.*.isActive' => 'boolean',
-            'productVariants.*.sortOrder' => 'integer|min:0',
         ];
     }
 
@@ -102,17 +92,6 @@ class StoreProductRequest extends FormRequest
             'tags'                => $data['tags'] ?? null,
 
 
-            'product_variants'    => collect($data['productVariants'] ?? [])->map(function ($variant) {
-                return [
-                    'name'              => $variant['name'],
-                    'price_adjustment'  => $variant['priceAdjustment'] ?? 0,
-                    'stock_quantity'    => $variant['stockQuantity'] ?? 0,
-                    'reserved_quantity' => $variant['reservedQuantity'] ?? 0,
-                    'attributes'        => $variant['attributes'] ?? [],
-                    'image'             => $variant['image'] ?? null,
-                    'is_active'         => $variant['isActive'] ?? true,
-                ];
-            })->toArray(),
         ];
     }
 }

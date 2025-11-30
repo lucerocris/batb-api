@@ -2,7 +2,10 @@
 
 namespace App\Filament\Resources\Categories\Tables;
 
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
@@ -18,16 +21,27 @@ class CategoriesTable
     {
         return $table
             ->columns([
+                // ImageColumn::make('image_preview')
+                //     ->label('Image')
+                //     ->circular()
+                //     ->getStateUsing(function ($record) {
+                //         if ($record->image_path) {
+                //             return asset('storage/' . ltrim($record->image_path, '/'));
+                //         }
+
+                //         return $record->image_url;
+                //     }),
                 TextColumn::make('name')
-                        ->label('name'),
-                ImageColumn::make('header_image')->disk('image_url'),
-                
+                    ->label('Name'),
             ])
             ->filters([
                 TrashedFilter::make(),
             ])
             ->recordActions([
-                EditAction::make(),
+                ActionGroup::make([
+                    EditAction::make(),
+                    DeleteAction::make(),
+                ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

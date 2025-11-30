@@ -18,7 +18,6 @@ class OrderItemResource extends JsonResource
             'id' => $this->id,
             'orderId' => $this->order_id,
             'productId' => $this->product_id,
-            'productVariantId' => $this->product_variant_id,
             'productName' => $this->product_name,
             'productSku' => $this->product_sku,
             'variantName' => $this->variant_name,
@@ -34,11 +33,8 @@ class OrderItemResource extends JsonResource
             'quantityShipped' => $this->quantity_shipped,
             'quantityReturned' => $this->quantity_returned,
             'imageUrl' => $this->when(
-                $this->relationLoaded('productVariant') || $this->relationLoaded('product'),
+                $this->relationLoaded('product'),
                 function () {
-                    if ($this->relationLoaded('productVariant') && $this->productVariant?->image_path) {
-                        return asset('storage/'.$this->productVariant->image_path);
-                    }
                     if ($this->relationLoaded('product') && $this->product?->image_path) {
                         return asset('storage/'.$this->product->image_path);
                     }
@@ -49,7 +45,6 @@ class OrderItemResource extends JsonResource
             // Nested resources
             'product' => new ProductResource($this->whenLoaded('product')),
             'order' => new OrderResource($this->whenLoaded('order')),
-            'product_variant' => new ProductVariantResource($this->whenLoaded('productVariant'))
         ];
     }
 }

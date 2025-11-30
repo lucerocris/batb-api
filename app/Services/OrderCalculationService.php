@@ -2,7 +2,6 @@
 
 namespace App\Services;
 use App\Models\Product;
-use App\Models\ProductVariant;
 use Illuminate\Support\Log;
 use App\Services\OrderItemAutoFillService;
 

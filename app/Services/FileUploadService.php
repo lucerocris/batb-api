@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\ProductVariant;
 use App\Models\User;
 use App\Models\Order;
 use App\Traits\HandlesFileUpload;
@@ -20,14 +19,45 @@ class FileUploadService
      */
     public function handleProductImage(Product $product, UploadedFile $file): ?string
     {
-        $categoryName = $product->category?->name;
-        if (!$categoryName) {
-            return null;
-        }
-
-        $directory = 'products/' . Str::slug($categoryName) . '/' . $product->slug;
+        $directory = $this->resolveProductDirectory($product);
         $filename = $this->generateProductFilename($product, $file);
         
+        return $this->uploadFileWithFixedName($file, $directory, $filename);
+    }
+
+    /**
+     * Handle gallery uploads for a Product entity.
+     *
+     * @param  array<UploadedFile>  $files
+     * @return array<int, string>
+     */
+    public function handleProductGalleryImages(Product $product, array $files): array
+    {
+        $storedPaths = [];
+
+        foreach ($files as $index => $file) {
+            if (! $file instanceof UploadedFile) {
+                continue;
+            }
+
+            $stored = $this->handleProductGalleryImage($product, $file, $index + 1);
+
+            if ($stored) {
+                $storedPaths[] = $stored;
+            }
+        }
+
+        return $storedPaths;
+    }
+
+    /**
+     * Store a single gallery image for the product.
+     */
+    public function handleProductGalleryImage(Product $product, UploadedFile $file, int $sequence = 1): ?string
+    {
+        $directory = $this->resolveProductDirectory($product) . '/gallery';
+        $filename = $this->generateProductGalleryFilename($product, $file, $sequence);
+
         return $this->uploadFileWithFixedName($file, $directory, $filename);
     }
 
@@ -48,23 +78,6 @@ class FileUploadService
         return $this->uploadFile($file, 'users');
     }
 
-    /**
-     * Handle file upload for a ProductVariant entity
-     */
-    public function handleProductVariantImage(ProductVariant $variant, UploadedFile $file): ?string
-    {
-        $product = $variant->product()->with('category')->first();
-        $categoryName = $product?->category?->name;
-        
-        if (!$categoryName) {
-            return null;
-        }
-
-        $directory = 'products/' . Str::slug($categoryName) . '/' . $product->slug;
-        $filename = $this->generateProductVariantFilename($variant, $product, $file);
-        
-        return $this->uploadFileWithFixedName($file, $directory, $filename);
-    }
 
     /**
      * Handle file upload for an Order entity (payment proof)
@@ -113,17 +126,24 @@ class FileUploadService
         return $product->slug . '.' . strtolower($ext ?: 'jpg');
     }
 
-    /**
-     * Generate filename for ProductVariant images
-     */
-    private function generateProductVariantFilename(ProductVariant $variant, Product $product, UploadedFile $file): string
+    private function generateProductGalleryFilename(Product $product, UploadedFile $file, int $sequence): string
     {
-        $ext = $file->getClientOriginalExtension();
-        $size = data_get($variant->attributes, 'size');
-        $namePart = $product->slug . ($size ? ('-size-' . Str::slug((string) $size)) : '');
-        
-        return $namePart . '.' . strtolower($ext ?: 'jpg');
+        $ext = $file->getClientOriginalExtension() ?: 'jpg';
+
+        return $product->slug . '-gallery-' . $sequence . '-' . Str::random(6) . '.' . strtolower($ext);
     }
+
+    private function resolveProductDirectory(Product $product): string
+    {
+        $categoryName = $product->category?->name;
+
+        if (! $categoryName) {
+            return 'products/' . $product->slug;
+        }
+
+        return 'products/' . Str::slug($categoryName) . '/' . $product->slug;
+    }
+
 
     /**
      * Generate filename for Order payment images

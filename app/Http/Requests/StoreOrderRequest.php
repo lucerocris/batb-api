@@ -37,8 +37,8 @@ class StoreOrderRequest extends FormRequest
             // Store Order Request
             'userId' => 'nullable|uuid|exists:users,id',
             'orderNumber' => 'required|string|max:20|unique:orders,order_number',
-            'fulfillmentStatus' => 'required|in:pending,processing,fulfilled,shipped,delivered,cancelled',
-            'paymentStatus' => 'required|in:pending,awaiting_confirmation,paid,failed,refunded',
+            'fulfillmentStatus' => 'required|in:pending,fulfilled,shipped,delivered,cancelled',
+            'paymentStatus' => 'required|in:pending,paid,failed,refunded',
             'paymentMethod' => 'required|in:bank_transfer,gcash',
             'email' => 'required|string|max:100',
             'expiresAt' => 'nullable|date',
@@ -82,7 +82,6 @@ class StoreOrderRequest extends FormRequest
             // Validate order items with optional design grouping metadata
             'orderItems' => 'required|array|min:1',
             'orderItems.*.productId' => 'required|uuid|exists:products,id',
-            'orderItems.*.productVariantId' => 'nullable|integer|exists:product_variants,id',
             'orderItems.*.quantity' => 'required|integer|min:1',
             'orderItems.*.unitPrice' => 'required|numeric|min:0',
 
@@ -115,6 +114,7 @@ class StoreOrderRequest extends FormRequest
             'fulfillment_status' => $data['fulfillmentStatus'],
             'payment_status' => $data['paymentStatus'],
             'payment_method' => $data['paymentMethod'],
+            'payment_reference' => $data['paymentReference'] ?? null,
             'email' => $data['email'],
             'expires_at' => $data['expiresAt'] ?? null,
             'order_date' => $data['orderDate'],
@@ -133,7 +133,6 @@ class StoreOrderRequest extends FormRequest
             ->map(function ($item) {
                 return [
                     'product_id' => $item['productId'],
-                    'product_variant_id' => $item['productVariantId'] ?? null,
                     'quantity' => $item['quantity'],
                     'unit_price' => $item['unitPrice'],
                 ];

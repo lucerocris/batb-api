@@ -54,17 +54,6 @@ class UpdateProductRequest extends FormRequest
             'averageRating' => 'nullable|numeric|min:0|max:5',
             'reviewCount' => 'nullable|integer|min:0',
 
-            'productVariants' => 'nullable|array',
-            'productVariants.*.id' => 'sometimes|exists:product_variants,id',
-            'productVariants.*.name' => 'required|string|max:255',
-            'productVariants.*.priceAdjustment' => 'numeric|min:0',
-            'productVariants.*.stockQuantity' => 'integer|min:0',
-            'productVariants.*.reservedQuantity' => 'integer|min:0',
-            'productVariants.*.attributes' => 'array',
-            'productVariants.*.attributes.*' => 'string',
-            'productVariants.*.image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'productVariants.*.isActive' => 'boolean',
-            'productVariants.*.sortOrder' => 'integer|min:0',
         ];
    }
 
@@ -101,19 +90,6 @@ class UpdateProductRequest extends FormRequest
             'average_rating'     => $data['averageRating'] ?? $data['average_rating'] ?? null,
             'review_count'       => $data['reviewCount'] ?? $data['review_count'] ?? null,
 
-            'product_variants'   => collect($data['productVariants'] ?? [])->map(function ($variant) {
-                return [
-                    'id'                => $variant['id'] ?? null,
-                    'name'              => $variant['name'],
-                    'price_adjustment'  => $variant['priceAdjustment'] ?? 0,
-                    'stock_quantity'    => $variant['stockQuantity'] ?? 0,
-                    'reserved_quantity' => $variant['reservedQuantity'] ?? 0,
-                    'attributes'        => $variant['attributes'] ?? [],
-                    'image'             => $variant['image'] ?? null,
-                    'is_active'         => $variant['isActive'] ?? true,
-                    'sort_order'        => $variant['sortOrder'] ?? 0,
-                ];
-            })->toArray(),
         ], fn($value) => $value !== null);
     }
 

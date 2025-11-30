@@ -2,7 +2,6 @@
 
 namespace App\Services;
 use App\Models\Product;
-use App\Models\ProductVariant;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Log;
 
@@ -31,7 +30,7 @@ class OrderItemAutoFillService{
             ->toArray();
 
         $this->products = Product::whereIn('id', $productIds)->get()->keyBy('id');
-        $this->variants = ProductVariant::whereIn('id', $variantIds)->get()->keyBy('id');
+        $this->variants = collect(); // ProductVariant removed
     }
 
     /**
@@ -59,9 +58,7 @@ class OrderItemAutoFillService{
             ->get()
             ->keyBy('id');
 
-        $variants = ProductVariant::whereIn('id', $variantIds)
-            ->get()
-            ->keyBy('id');
+        $variants = collect(); // ProductVariant removed
 
         // Process each item using the pre-loaded data
         return array_map(function($item) use ($products, $variants) {
@@ -91,17 +88,7 @@ class OrderItemAutoFillService{
             $unitPrice = $product->sale_price ?? $product->base_price;
         }
 
-        // Add variant data and adjust price
-        if (isset($item['product_variant_id']) && $variants->has($item['product_variant_id'])) {
-            $variant = $variants[$item['product_variant_id']];
-            $item['variant_name'] = $variant->name;
-            $item['variant_sku'] = $variant->sku;
-
-            // Apply variant price adjustment
-            if ($variant->price_adjustment) {
-                $unitPrice += $variant->price_adjustment;
-            }
-        }
+        // ProductVariant removed - variant data no longer processed
 
         $item['unit_price'] = $unitPrice;
 
@@ -128,19 +115,7 @@ class OrderItemAutoFillService{
             }
         }
 
-        // Add variant data and adjust price from preloaded data
-        if (isset($item['product_variant_id']) && $this->variants) {
-            $variant = $this->variants->get($item['product_variant_id']);
-            if ($variant) {
-                $item['variant_name'] = $variant->name;
-                $item['variant_sku'] = $variant->sku;
-
-                // Apply variant price adjustment
-                if ($variant->price_adjustment) {
-                    $unitPrice += $variant->price_adjustment;
-                }
-            }
-        }
+        // ProductVariant removed - variant data no longer processed
 
         $item['unit_price'] = $unitPrice;
 

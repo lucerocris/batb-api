@@ -17,7 +17,6 @@ class InventoryMovementResource extends JsonResource
         return [
             'id' => $this->id,
             'product' => new ProductResource($this->whenLoaded('product')),
-            'productVariant' => new ProductVariantResource($this->whenLoaded('productVariant')),
             'order' => new OrderResource($this->whenLoaded('order')),
             'user' => new UserResource($this->whenLoaded('user')),
             'type' => $this->type,

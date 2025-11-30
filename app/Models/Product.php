@@ -32,6 +32,7 @@ class Product extends Model
         'stock_status',
         'type',
         'image_path',
+        'gallery_images',
         'is_active',
         'is_featured',
         'available_from',
@@ -60,15 +61,9 @@ class Product extends Model
         'purchase_count' => 'integer',
         'average_rating' => 'float',
         'review_count' => 'integer',
+        'gallery_images' => 'array',
     ];
 
-    public function updateStockFromVariants()
-    {
-        if($this->productVariants()->exists()){
-            $this->stock_quantity = $this->productVariants()->sum('stock_quantity');
-            $this->save();
-        }
-    }
 
     protected static function booted()
     {
@@ -96,10 +91,6 @@ class Product extends Model
         return $this->belongsTo(Category::class, 'category_id');
     }
 
-    public function productVariants() : HasMany
-    {
-        return $this->hasMany(ProductVariant::class, 'product_id');
-    }
 
     public function inventoryLogs() : HasMany
     {
