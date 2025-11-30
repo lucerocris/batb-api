@@ -72,6 +72,8 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 
+Route::post('/inquiries', [\App\Http\Controllers\InquiriesController::class, 'store']);
+
 Route::apiResource('orders', OrderController::class);
 Route::post('orders/{order}/review-payment', [OrderController::class, 'reviewPaymentProof']);
 Route::put('orders/{order}/fulfillment-status', [OrderController::class, 'updateFulfillmentStatus']);
