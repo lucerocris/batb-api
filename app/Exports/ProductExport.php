@@ -22,68 +22,19 @@ class ProductExport implements FromCollection, WithHeadings, WithMapping
 
     public function collection()
     {
-        $query = Product::with(['productVariants', 'category'])
+        $query = Product::with(['category'])
             ->when($this->filters['active_only'] ?? false, function ($query) {
                 return $query->where('is_active', true);
             });
 
         $products = $query->get();
 
-        if ($this->filters['include_variants'] ?? false) {
-            return $this->flattenWithVariants($products);
-        }
-
         return $products;
     }
 
-    protected function flattenWithVariants(Collection $products)
-    {
-        $flattened = collect();
-
-        foreach ($products as $product) {
-            if ($product->productVariants->count() > 0) {
-                foreach ($product->productVariants as $variant) {
-                    $flattened->push((object) [
-                        'product' => $product,
-                        'variant' => $variant,
-                    ]);
-                }
-            } else {
-                $flattened->push((object) [
-                    'product' => $product,
-                    'variant' => null,
-                ]);
-            }
-        }
-
-        return $flattened;
-    }
 
     public function headings(): array
     {
-        if ($this->filters['include_variants'] ?? false) {
-            return [
-                'Type',
-                'Product ID',
-                'Product Name',
-                'Product SKU',
-                'Category',
-                'Base Price',
-                'Sale Price',
-                'Stock Quantity',
-                'Variant ID',
-                'Variant Name',
-                'Variant SKU',
-                'Variant Price Adjustment',
-                'Variant Stock',
-                'Variant Attributes',
-                'Is Active',
-                'Is Featured',
-                'Created At',
-                'Updated At'
-            ];
-        }
-
         return [
             'ID',
             'Name',
@@ -104,32 +55,6 @@ class ProductExport implements FromCollection, WithHeadings, WithMapping
 
     public function map($row): array
     {
-        if ($this->filters['include_variants'] ?? false) {
-            $product = $row->product;
-            $variant = $row->variant;
-
-            return [
-                $product->type,
-                $product->id,
-                $product->name,
-                $product->sku,
-                $product->category->name ?? '',
-                $product->base_price,
-                $product->sale_price,
-                $product->stock_quantity,
-                $variant->id ?? '',
-                $variant->name ?? '',
-                $variant->sku ?? '',
-                $variant->price_adjustment ?? '',
-                $variant->stock_quantity ?? '',
-                $variant ? $variant->attributes : '',
-                $product->is_active ? 'Yes' : 'No',
-                $product->is_featured ? 'Yes' : 'No',
-                $product->created_at->format('Y-m-d H:i:s'),
-                $product->updated_at->format('Y-m-d H:i:s')
-            ];
-        }
-
         return [
             $row->id,
             $row->name,

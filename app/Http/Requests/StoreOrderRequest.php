@@ -82,7 +82,6 @@ class StoreOrderRequest extends FormRequest
             // Validate order items with optional design grouping metadata
             'orderItems' => 'required|array|min:1',
             'orderItems.*.productId' => 'required|uuid|exists:products,id',
-            'orderItems.*.productVariantId' => 'nullable|integer|exists:product_variants,id',
             'orderItems.*.quantity' => 'required|integer|min:1',
             'orderItems.*.unitPrice' => 'required|numeric|min:0',
 
@@ -133,7 +132,6 @@ class StoreOrderRequest extends FormRequest
             ->map(function ($item) {
                 return [
                     'product_id' => $item['productId'],
-                    'product_variant_id' => $item['productVariantId'] ?? null,
                     'quantity' => $item['quantity'],
                     'unit_price' => $item['unitPrice'],
                 ];

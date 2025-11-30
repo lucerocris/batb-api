@@ -37,7 +37,6 @@ class ProductResource extends JsonResource
             'isFeatured' => (bool) $this->is_featured,
             'tags' => $this->tags ?? [],
             'createdAt'=> $this->created_at,
-            'productVariants' => ProductVariantResource::collection($this->whenLoaded('productVariants')),
             'category' => new CategoryResource($this->whenLoaded('category')),
             'orderItems' => OrderItemResource::collection($this->whenLoaded('orderItems'))
         ];

@@ -23,7 +23,6 @@ class UpdateInventoryMovementRequest extends FormRequest
     {
         return [
             'productId' => 'sometimes|uuid|exists:products,id',
-            'productVariantId' => 'sometimes|integer|exists:product_variants,id',
             'orderId' => 'sometimes|nullable|uuid|exists:orders,id',
             'userId' => 'sometimes|uuid|exists:users,id',
             'type' => 'sometimes|string|in:purchase,sale,adjustment,return,transfer',
@@ -42,7 +41,6 @@ class UpdateInventoryMovementRequest extends FormRequest
 
     return [
         'product_id'       => $data['productId'] ?? null,
-        'product_variant_id' => $data['productVariantId'] ?? null,
         'order_id'         => $data['orderId'] ?? null,
         'user_id'          => $data['userId'] ?? null,
         'type'             => $data['type'] ?? null,

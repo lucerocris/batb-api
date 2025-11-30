@@ -13,7 +13,6 @@ use App\Traits\HandlesFileUpload;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Services\ProductVariantService;
 use App\Services\ProductCreationService;
 
 class ProductController extends Controller
@@ -22,7 +21,6 @@ class ProductController extends Controller
 
     public function __construct(
         private FileUploadService $fileUploadService,
-        private ProductVariantService $variantService,
         private ProductCreationService $creationService
     ) {}
 
@@ -36,7 +34,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::with(['category', 'productVariants'])->get();
+        $products = Product::with(['category'])->get();
         return ProductResource::collection($products);
     }
 
@@ -60,7 +58,7 @@ class ProductController extends Controller
     public function show(Product $product)
     {
 
-        $product->load(['category', 'productVariants']);
+        $product->load(['category']);
         return new ProductResource($product);
     }
 
@@ -75,11 +73,7 @@ class ProductController extends Controller
          $this->handleProductImage($product, $data['image'] ?? null);
          $this->updateProductFields($product, $data);
          
-         if (array_key_exists('product_variants', $data)) {
-             $this->variantService->handleVariantsForUpdate($product, $data['product_variants']);
-         }
- 
-         return new ProductResource($product->load('productVariants'));
+         return new ProductResource($product);
      }
 
      private function handleProductImage(Product $product, $image): void
@@ -123,14 +117,14 @@ class ProductController extends Controller
     public function showAll(){
 
         $products = Product::withTrashed()
-            ->with(['category', 'productVariants'])->get();
+            ->with(['category'])->get();
 
         return ProductResource::collection($products);
     }
 
     public function trashed(){
 
-        $products = Product::onlyTrashed()->with(['category'], ['productVariants'])->get();
+        $products = Product::onlyTrashed()->with(['category'])->get();
 
         return response()->json($products);
 
@@ -158,7 +152,7 @@ class ProductController extends Controller
 
         $product = $this->creationService->createProduct($productData, $variantsData);
 
-        return new ProductResource($product->load('productVariants'));
+        return new ProductResource($product);
     }
 
 }

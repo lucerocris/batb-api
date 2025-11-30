@@ -20,7 +20,7 @@ class OrdersExport implements FromCollection, WithHeadings, WithMapping
 
     public function collection()
     {
-        $query = Order::with(['user', 'orderItems.product', 'orderItems.productVariant'])
+        $query = Order::with(['user', 'orderItems.product'])
             ->when($this->filters['status'] ?? false, function ($query) {
                 return $query->where('status', $this->filters['status']);
             })
@@ -86,8 +86,6 @@ class OrdersExport implements FromCollection, WithHeadings, WithMapping
                 'Item ID',
                 'Product Name',
                 'Product SKU',
-                'Variant Name',
-                'Variant SKU',
                 'Quantity',
                 'Unit Price',
                 'Total Price',
@@ -160,8 +158,6 @@ class OrdersExport implements FromCollection, WithHeadings, WithMapping
                 $item->id ?? '',
                 $item->product->name ?? '',
                 $item->product->sku ?? '',
-                $item->productVariant->name ?? '',
-                $item->productVariant->sku ?? '',
                 $item->quantity ?? '',
                 $item->unit_price ?? '',
                 $item->total_price ?? '',

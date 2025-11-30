@@ -15,7 +15,7 @@ class OrderItemController extends Controller
      */
     public function index()
     {
-        $orderItems = OrderItem::with(['product', 'order', 'productVariant'])->get();
+        $orderItems = OrderItem::with(['product', 'order'])->get();
         return OrderItemResource::collection($orderItems);
     }
 
@@ -36,7 +36,7 @@ class OrderItemController extends Controller
      */
     public function show(OrderItem $orderItem)
     {
-        $orderItem->load(['product', 'order', 'productVariant']);
+        $orderItem->load(['product', 'order']);
         return new OrderItemResource($orderItem);
     }
 

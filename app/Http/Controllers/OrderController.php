@@ -32,7 +32,6 @@ class OrderController extends Controller
             'verifiedBy',
             'orderItems',
             'orderItems.product',
-            'orderItems.productVariant',
         ];
 
         $requested = collect(explode(',', (string) $request->query('include', '')))
@@ -53,7 +52,6 @@ class OrderController extends Controller
                         $with[] = 'orderItems';
                         // auto-include common nested relations for items
                         $with[] = 'orderItems.product';
-                        $with[] = 'orderItems.productVariant';
                     } else {
                         $with[] = $inc;
                     }
@@ -67,7 +65,6 @@ class OrderController extends Controller
                 'user',
                 'verifiedBy',
                 'orderItems.product',
-                'orderItems.productVariant',
             ];
         }
 
@@ -282,7 +279,6 @@ class OrderController extends Controller
             'verifiedBy',
             'orderItems',
             'orderItems.product',
-            'orderItems.productVariant',
         ];
 
         $requested = collect(explode(',', (string) $request->query('include', '')))
@@ -301,7 +297,6 @@ class OrderController extends Controller
                     if ($inc === 'orderItems') {
                         $with[] = 'orderItems';
                         $with[] = 'orderItems.product';
-                        $with[] = 'orderItems.productVariant';
                     } else {
                         $with[] = $inc;
                     }
@@ -314,7 +309,6 @@ class OrderController extends Controller
                 'user',
                 'verifiedBy',
                 'orderItems.product',
-                'orderItems.productVariant',
             ];
         }
 

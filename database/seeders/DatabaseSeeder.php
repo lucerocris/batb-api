@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\ProductVariant;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Address;
@@ -51,46 +50,19 @@ class DatabaseSeeder extends Seeder
 
         $products = $shirtProducts;
 
-        // Create variants for sizes
-        $variants = $products->flatMap(function ($product) {
-            $variants = collect();
-
-            // Each product has only one size variant based on the product data
-            $sizeData = $this->getProductSizeData($product->name);
-
-            if ($sizeData) {
-                $variants->push(ProductVariant::factory()->create([
-                    'product_id' => $product->id,
-                    'name' => "Size {$sizeData['size']}",
-                    'type' => 'size',
-                    'value' => $sizeData['size'],
-                    'stock_status' => 'available', // single item thrift finds are available
-                ]));
-
-                $product->update(['stock_status' => 'available']);
-            }
-
-            return $variants;
-        });
-
         // Create orders
-        $orders = $users->flatMap(function ($user) use ($products, $variants) {
+        $orders = $users->flatMap(function ($user) use ($products) {
             return Order::factory(fake()->numberBetween(0, 2))->create([
                 'user_id' => $user->id
-            ])->each(function ($order) use ($products, $variants) {
+            ])->each(function ($order) use ($products) {
                 foreach (range(1, fake()->numberBetween(1, 2)) as $_) {
                     $product = $products->random();
-                    $productVariants = $variants->where('product_id', $product->id);
-                    $variant = $productVariants->isNotEmpty() ? $productVariants->random() : null;
 
                     OrderItem::factory()->create([
                         'order_id' => $order->id,
                         'product_id' => $product->id,
-                        'product_variant_id' => $variant?->id,
                         'product_name' => $product->name,
                         'product_sku' => $product->sku,
-                        'variant_name' => $variant?->name,
-                        'variant_sku' => $variant?->sku,
                     ]);
                 }
             });
@@ -99,20 +71,15 @@ class DatabaseSeeder extends Seeder
         // Create guest orders
         $guestOrders = Order::factory(3)->create([
             'user_id' => null
-        ])->each(function ($order) use ($products, $variants) {
+        ])->each(function ($order) use ($products) {
             foreach (range(1, fake()->numberBetween(1, 2)) as $_) {
                 $product = $products->random();
-                $productVariants = $variants->where('product_id', $product->id);
-                $variant = $productVariants->isNotEmpty() ? $productVariants->random() : null;
 
                 OrderItem::factory()->create([
                     'order_id' => $order->id,
-                    'product_id' => $product->id,
-                    'product_variant_id' => $variant?->id,
+                    'product_id' => $product->id,                    
                     'product_name' => $product->name,
                     'product_sku' => $product->sku,
-                    'variant_name' => $variant?->name,
-                    'variant_sku' => $variant?->sku,
                 ]);
             }
         });
@@ -125,14 +92,10 @@ class DatabaseSeeder extends Seeder
         });
 
         // Create inventory movements
-        $products->each(function ($product) use ($variants) {
-            $productVariants = $variants->where('product_id', $product->id);
-            if ($productVariants->isNotEmpty()) {
-                InventoryMovement::factory(1)->create([
-                    'product_id' => $product->id,
-                    'product_variant_id' => $productVariants->first()->id
-                ]);
-            }
+            $products->each(function ($product) {
+            InventoryMovement::factory(1)->create([
+                'product_id' => $product->id,
+            ]);
         });
 
         $this->command->info('✅ Clothing store data seeded successfully!');

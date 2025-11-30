@@ -64,13 +64,6 @@ class Product extends Model
         'gallery_images' => 'array',
     ];
 
-    public function updateStockFromVariants()
-    {
-        if($this->productVariants()->exists()){
-            $this->stock_quantity = $this->productVariants()->sum('stock_quantity');
-            $this->save();
-        }
-    }
 
     protected static function booted()
     {
@@ -98,10 +91,6 @@ class Product extends Model
         return $this->belongsTo(Category::class, 'category_id');
     }
 
-    public function productVariants() : HasMany
-    {
-        return $this->hasMany(ProductVariant::class, 'product_id');
-    }
 
     public function inventoryLogs() : HasMany
     {

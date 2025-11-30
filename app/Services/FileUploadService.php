@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\ProductVariant;
 use App\Models\User;
 use App\Models\Order;
 use App\Traits\HandlesFileUpload;
@@ -79,23 +78,6 @@ class FileUploadService
         return $this->uploadFile($file, 'users');
     }
 
-    /**
-     * Handle file upload for a ProductVariant entity
-     */
-    public function handleProductVariantImage(ProductVariant $variant, UploadedFile $file): ?string
-    {
-        $product = $variant->product()->with('category')->first();
-        $categoryName = $product?->category?->name;
-        
-        if (!$categoryName) {
-            return null;
-        }
-
-        $directory = 'products/' . Str::slug($categoryName) . '/' . $product->slug;
-        $filename = $this->generateProductVariantFilename($variant, $product, $file);
-        
-        return $this->uploadFileWithFixedName($file, $directory, $filename);
-    }
 
     /**
      * Handle file upload for an Order entity (payment proof)
@@ -162,17 +144,6 @@ class FileUploadService
         return 'products/' . Str::slug($categoryName) . '/' . $product->slug;
     }
 
-    /**
-     * Generate filename for ProductVariant images
-     */
-    private function generateProductVariantFilename(ProductVariant $variant, Product $product, UploadedFile $file): string
-    {
-        $ext = $file->getClientOriginalExtension();
-        $size = data_get($variant->attributes, 'size');
-        $namePart = $product->slug . ($size ? ('-size-' . Str::slug((string) $size)) : '');
-        
-        return $namePart . '.' . strtolower($ext ?: 'jpg');
-    }
 
     /**
      * Generate filename for Order payment images

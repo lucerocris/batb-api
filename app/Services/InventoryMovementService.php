@@ -3,7 +3,6 @@
 namespace App\Services;
 use Illuminate\Http\Request;
 use App\Models\Product;
-use App\Models\ProductVariant;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
@@ -34,24 +33,6 @@ class InventoryMovementService{
         }
     }
 
-    public function productVariantUpdateStockLog(int $productVariantId, string $adjustmentType, int $quantity){
-        try{
-            $variant = ProductVariant::findOrFail($productVariantId);
-            if(Str::lower($adjustmentType) === "increase"){
-                $variant->stock_quantity += $quantity;
-            }else if(Str::lower($adjustmentType) === "decrease"){
-                if($variant->stock_quantity < $quantity){
-                    throw new \Exception('There is insuffcient stocks for this request');
-                }
-                $variant->stock_quantity -= $quantity;
-            }else{
-                throw new \Exception('adjustment type value unknown');
-            }
-            $variant->save();
-        }catch(ModelNotFoundException $e){
-            throw new \Exception('No Product variant found');
-        }
-    }
 
     /**
      * Method To Create inventoryMovement Payload for orderItem
@@ -85,18 +66,6 @@ class InventoryMovementService{
         ];
     }
 
-    public function newProductVariantPayloadGenerator(array $productVariantDetails){
-        return [
-            'product_id'            => $productVariantDetails['product_id'],
-            'product_variant_id'    => $productVariantDetails['product_variant_id'],
-            'quantity'              => $productVariantDetails['quantity'],
-            'adjustment_type'       => 'increase',
-            'initial_quantity'      => 0,
-            'type'                  => 'creation',
-            'created_at'            => now(),
-            'updated_at'            => now(),
-        ];
-    }
 
     public function adjustStockAndLog(array $data): InventoryMovement
     {
@@ -115,19 +84,11 @@ class InventoryMovementService{
             $movement = InventoryMovement::create($validated);
 
             // Adjust stock
-            if (!empty($validated['product_variant_id'])) {
-                $this->productVariantUpdateStockLog(
-                    $validated['product_variant_id'],
-                    $validated['adjustment_type'],
-                    $validated['quantity']
-                );
-            } else {
-                $this->productUpdateStockLog(
-                    $validated['product_id'],
-                    $validated['adjustment_type'],
-                    $validated['quantity']
-                );
-            }
+            $this->productUpdateStockLog(
+                $validated['product_id'],
+                $validated['adjustment_type'],
+                $validated['quantity']
+            );
 
             return $movement;
         });
@@ -138,8 +99,4 @@ class InventoryMovementService{
         InventoryMovement::create($productLog);
     } 
 
-    public function newProductVariantLog(array $productVariantDetails){
-        $productVariantLog = $this->newProductVariantPayloadGenerator($productVariantDetails);
-        InventoryMovement::create($productVariantLog);
-    } 
 }
