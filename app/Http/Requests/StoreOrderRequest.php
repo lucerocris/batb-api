@@ -40,10 +40,12 @@ class StoreOrderRequest extends FormRequest
             'fulfillmentStatus' => 'required|in:pending,processing,fulfilled,shipped,delivered,cancelled',
             'paymentStatus' => 'required|in:pending,awaiting_confirmation,paid,failed,refunded',
             'paymentMethod' => 'required|in:bank_transfer,gcash',
+            'paymentReference' => 'required|string|max:100',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'paymentSentDate' => 'required|date',
             'email' => 'required|string|max:100',
             'expiresAt' => 'nullable|date',
             'orderDate' => 'required|date',
-            'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:5120',
             'idempotencyKey' => 'required|uuid',
 
 
@@ -60,22 +62,8 @@ class StoreOrderRequest extends FormRequest
             'shippingAddress.region' => 'required|string|max:100',
             'shippingAddress.phone' => 'required|string|max:100',
 
-            'billingAddress' => 'nullable|array',
-            'billingAddress.firstName' => 'nullable|string|max:100',
-            'billingAddress.lastName' => 'nullable|string|max:100',
-            'billingAddress.addressLine1' => 'nullable|string|max:255',
-            'billingAddress.addressLine2' => 'nullable|string|max:255',
-            'billingAddress.city' => 'nullable|string|max:100',
-            'billingAddress.province' => 'nullable|string|max:100',
-            'billingAddress.barangay' => 'nullable|string|max:100',
-            'billingAddress.postalCode' => 'nullable|string|max:10',
-            'billingAddress.countryCode' => 'nullable|string|size:2',
-            'billingAddress.region' => 'nullable|string|max:100',
-            'billingAddress.phone' => 'nullable|string|max:100',
 
-            'discountAmount' => 'nullable|numeric|min:0',
-            'shippingAmount' => 'nullable|numeric|min:0',
-            'taxAmount' => 'nullable|numeric|min:0',
+
             'currency' => 'required|string|size:3',
             'customerNotes' => 'nullable|string',
 
@@ -85,15 +73,7 @@ class StoreOrderRequest extends FormRequest
             'orderItems.*.quantity' => 'required|integer|min:1',
             'orderItems.*.unitPrice' => 'required|numeric|min:0',
 
-            // Optional designs metadata array for snapshot
-            'designs' => 'nullable|array',
-            'designs.*.designKey' => 'required|string|max:64',
-            'designs.*.name' => 'nullable|string|max:150',
-            'designs.*.imageUrl' => 'nullable|url|max:2048',
 
-            // Optional uploaded design images keyed by designKey
-            'designImages' => 'nullable|array',
-            'designImages.*' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:8192',
 
             // Messages
             'email.email' => 'Please provide a valid email address.',

@@ -56,6 +56,7 @@ return new class extends Migration
             $table->string('type')->default('shirt');
             //images & meta
             $table->string('image_path')->nullable();
+            $table->string('stock_quantity')->default(1);
             $table->boolean('is_active')->default(true);
             $table->boolean('is_featured')->default(false);
 

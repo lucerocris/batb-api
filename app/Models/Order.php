@@ -50,6 +50,7 @@ class Order extends Model
         'last_reminder_sent',
         'order_date',
         'tip',
+        'image_path',
     ];
 
     protected $casts = [
