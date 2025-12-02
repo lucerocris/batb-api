@@ -11,6 +11,7 @@ use App\Filament\Resources\Orders\Tables\OrdersTable;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists;
 use App\Models\Order;
+use UnitEnum;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
@@ -30,8 +31,9 @@ class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::ShoppingBag;
+    protected static string|UnitEnum|null $navigationGroup = 'Sales';
+    protected static ?int $navigationSort = 1; // first within Sales
     public static function form(Schema $schema): Schema
     {
         return OrderForm::configure($schema);

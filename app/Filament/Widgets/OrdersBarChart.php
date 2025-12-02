@@ -11,11 +11,14 @@ use Filament\Widgets\ChartWidget;
 
 class OrdersBarChart extends ChartWidget
 {
+    protected static ?int $sort = 5;
+    protected int|string|array $columnSpan = 3;
+
     protected ?string $heading = 'Orders made per Month';
 
     protected function getData(): array
     {
-        
+
 
         $orders = Order::selectRaw('MONTH(order_date) as month, COUNT(*) as count')
             ->whereNotNull('order_date')
@@ -28,7 +31,7 @@ class OrdersBarChart extends ChartWidget
 
         for ($m = 1; $m <= 12; $m++) {
             $labels[] = Carbon::create()->month($m)->format('M');
-            $data[] = $orders[$m] ?? 0; 
+            $data[] = $orders[$m] ?? 0;
         }
 
         return [
@@ -44,7 +47,6 @@ class OrdersBarChart extends ChartWidget
 
     protected function getType(): string
     {
-        return 'bar'; 
+        return 'bar';
     }
-
 }

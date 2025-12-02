@@ -25,6 +25,7 @@ class ProductsTable
         return $table
             ->columns([
                 ImageColumn::make('image_preview')
+                    ->size(40)
                     ->label('Image')
                     ->getStateUsing(function ($record) {
                         if ($record->image_path) {
@@ -35,7 +36,7 @@ class ProductsTable
                     }),
                 TextColumn::make('stock_status'),
                 TextColumn::make('name'),
-                TextColumn::make('sku'),         
+                TextColumn::make('sku'),
                 TextColumn::make('is_active')
                 ->label('Status')
                 ->formatStateUsing(fn ($state) => $state ? 'Active' : 'Inactive'),
