@@ -10,6 +10,7 @@ use App\Models\OrderItem;
 use App\Models\Address;
 use App\Models\InventoryMovement;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -50,38 +51,19 @@ class DatabaseSeeder extends Seeder
 
         $products = $shirtProducts;
 
-        // Create orders
+        // Create customer orders with richer timelines for dashboard charts
         $orders = $users->flatMap(function ($user) use ($products) {
-            return Order::factory(fake()->numberBetween(0, 2))->create([
-                'user_id' => $user->id
-            ])->each(function ($order) use ($products) {
-                foreach (range(1, fake()->numberBetween(1, 2)) as $_) {
-                    $product = $products->random();
-
-                    OrderItem::factory()->create([
-                        'order_id' => $order->id,
-                        'product_id' => $product->id,
-                        'product_name' => $product->name,
-                        'product_sku' => $product->sku,
-                    ]);
-                }
-            });
+            return Order::factory(fake()->numberBetween(2, 4))->create([
+                'user_id' => $user->id,
+            ]);
         });
 
-        // Create guest orders
-        $guestOrders = Order::factory(3)->create([
-            'user_id' => null
-        ])->each(function ($order) use ($products) {
-            foreach (range(1, fake()->numberBetween(1, 2)) as $_) {
-                $product = $products->random();
+        $guestOrders = Order::factory(10)->create([
+            'user_id' => null,
+        ]);
 
-                OrderItem::factory()->create([
-                    'order_id' => $order->id,
-                    'product_id' => $product->id,                    
-                    'product_name' => $product->name,
-                    'product_sku' => $product->sku,
-                ]);
-            }
+        $orders->merge($guestOrders)->each(function (Order $order) use ($products) {
+            $this->attachItemsToOrder($order, $products);
         });
 
         // Create user addresses
@@ -344,5 +326,46 @@ class DatabaseSeeder extends Seeder
         $product->update(['image_path' => $destinationPath]);
 
         $this->command->info("📸 Copied image for: {$product->name}");
+    }
+    private function attachItemsToOrder(Order $order, Collection $products): void
+    {
+        $lineItemsTotal = 0;
+
+        foreach (range(1, fake()->numberBetween(1, 3)) as $_) {
+            $product = $products->random();
+            $quantity = fake()->numberBetween(1, 2);
+            $unitPrice = $product->sale_price ?? $product->base_price;
+            $lineTotal = $unitPrice * $quantity;
+
+            OrderItem::factory()->create([
+                'order_id' => $order->id,
+                'product_id' => $product->id,
+                'product_name' => $product->name,
+                'product_sku' => $product->sku,
+                'quantity' => $quantity,
+                'unit_price' => $unitPrice,
+                'line_total' => $lineTotal,
+            ]);
+
+            $lineItemsTotal += $lineTotal;
+        }
+
+        $this->recalculateOrderTotals($order, $lineItemsTotal);
+    }
+
+    private function recalculateOrderTotals(Order $order, float $lineItemsTotal): void
+    {
+        $shippingAmount = $order->shipping_amount ?? 0;
+        $discountAmount = min($order->discount_amount ?? 0, $lineItemsTotal * 0.4);
+        $taxAmount = round($lineItemsTotal * 0.12, 2);
+        $total = max($lineItemsTotal + $taxAmount + $shippingAmount - $discountAmount, 0);
+
+        $order->update([
+            'subtotal' => $lineItemsTotal,
+            'tax_amount' => $taxAmount,
+            'discount_amount' => $discountAmount,
+            'total_amount' => $total,
+            'refunded_amount' => $order->payment_status === 'refunded' ? $total : ($order->refunded_amount ?? 0),
+        ]);
     }
 }

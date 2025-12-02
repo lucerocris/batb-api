@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Http\Requests;
@@ -80,10 +79,8 @@ class StoreOrderItemRequest extends FormRequest
                     'quantity' => $item['quantity'] ?? null,
                     'unit_price' => $item['unitPrice'] ?? null,
                 ];
-
             })->toArray();
         }
         return $snake;
-
     }
 }

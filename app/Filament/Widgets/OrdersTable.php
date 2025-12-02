@@ -1,35 +1,24 @@
 <?php
 
-namespace App\Filament\Resources\Orders\Tables;
+namespace App\Filament\Widgets;
 
-use Filament\Actions\ActionGroup;
+use App\Models\Order as ModelsOrder;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+use Filament\Widgets\TableWidget;
+use Illuminate\Database\Eloquent\Builder;
+use Order;
 
-
-
-class OrdersTable
+class OrdersTable extends TableWidget
 {
-    public static function configure(Table $table): Table
+    protected static ?int $sort = 5;
+    protected int|string|array $columnSpan = 6;
+    public function table(Table $table): Table
     {
         return $table
+            ->query(fn (): Builder => ModelsOrder::query())
             ->columns([
-                // ImageColumn::make('image_preview')
-                //     ->label('Payment Proof')
-                //     ->toggleable()
-                //     ->getStateUsing(function ($record) {
-                //         if ($record->image_path) {
-                //             return assets('storage/' . ltrim($record->image_path, '/'));
-                //         }
-
-                //         return $record->image_url;
-                //     }),
                 TextColumn::make('shipping_address')
                     ->label('Customer')
                     ->getStateUsing(function ($record) {
@@ -39,8 +28,6 @@ class OrdersTable
                         return trim("$firstName $lastName") ?: 'Unknown User';
                     }),
                 TextColumn::make('order_number'),
-                TextColumn::make('payment_method')
-                    ->formatStateUsing(fn(string $state) => str($state)->replace('_', ' ')->title()),
                 TextColumn::make('payment_status')
                     ->label('Payment Status')
                     ->badge()
@@ -65,62 +52,20 @@ class OrdersTable
                         default => 'gray',
                     }),
                 TextColumn::make('total_amount')->money('php'),
-
             ])
             ->filters([
                 //
             ])
-
+            ->headerActions([
+                //
+            ])
             ->recordActions([
-                ViewAction::make(),
-                ActionGroup::make([
-                    EditAction::make(),
-                    DeleteAction::make(),
-                ])
+                //
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    //
                 ]),
             ]);
     }
 }
-
-
-/*
-
-   protected $fillable = [
-        'id',
-        'user_id',
-        'order_number',
-        'status',
-        'fulfillment_status',
-        'payment_status',
-        'payment_method',
-        'payment_due_date',
-        'payment_sent_date',
-        'payment_verified_date',
-        'payment_verified_by',
-        'expires_at',
-        'payment_instructions',
-        'payment_reference',
-        'idempotency_key',
-        'subtotal',
-        'tax_amount',
-        'phone_number',
-        'shipping_amount',
-        'discount_amount',
-        'total_amount',
-        'email',
-        'refunded_amount',
-        'currency',
-        'shipping_address',
-        'billing_address',
-        'admin_notes',
-        'customer_notes',
-        'reminder_sent_count',
-        'last_reminder_sent',
-        'order_date',
-        'tip',
-    ];
-*/

@@ -31,7 +31,7 @@ class UsersTable
                 //     ->height(45)
                 //     ->getStateUsing(function ($record) {
                 //         if ($record->image_path) {
-                //             return asset('storage/' . ltrim($record->image_path, '/'));
+                //             return assets('storage/' . ltrim($record->image_path, '/'));
                 //         }
 
                 //         return $record->image_url;

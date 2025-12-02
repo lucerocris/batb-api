@@ -49,7 +49,6 @@ class Order extends Model
         'reminder_sent_count',
         'last_reminder_sent',
         'order_date',
-        'tip',
     ];
 
     protected $casts = [
@@ -62,7 +61,6 @@ class Order extends Model
         'tax_amount' => 'float',
         'shipping_amount' => 'float',
         'discount_amount' => 'float',
-        'tip' =>'float',
         'total_amount' => 'float',
         'refunded_amount' => 'float',
         'shipping_address' => 'array',     // JSON → array
