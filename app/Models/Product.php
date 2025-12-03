@@ -32,7 +32,6 @@ class Product extends Model
         'stock_status',
         'type',
         'image_path',
-        'gallery_images',
         'is_active',
         'is_featured',
         'available_from',
@@ -61,7 +60,6 @@ class Product extends Model
         'purchase_count' => 'integer',
         'average_rating' => 'float',
         'review_count' => 'integer',
-        'gallery_images' => 'array',
     ];
 
 
