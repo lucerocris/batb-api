@@ -25,7 +25,6 @@ class ProductsTable
         return $table
             ->columns([
                 ImageColumn::make('image_preview')
-                    ->size(40)
                     ->label('Image')
                     ->getStateUsing(function ($record) {
                         if ($record->image_path) {

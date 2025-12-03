@@ -15,7 +15,7 @@ class ProductForm
 {
     public static function configure(Schema $schema): Schema
     {
-             
+
         return $schema
             ->components([
                 Select::make('category_id')
@@ -72,19 +72,14 @@ class ProductForm
                         'classic' => 'Classic',
                     ])
                     ->required(),
-                FileUpload::make('gallery_images')
-                    ->label('Product Images')
+                FileUpload::make('image_path')
+                    ->label('Main Image')
                     ->image()
-                    ->multiple()
-                    ->maxFiles(4)
-                    ->disk('public')
-                    ->reorderable()
-                    ->appendFiles()
-                    ->imageEditor()
-                    ->maxSize(2048)
+                    ->directory('products')
                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/svg'])
-                    ->helperText('Upload up to 4 images. The first image becomes the thumbnail shown in listings.')
+                    ->helperText('This will be the product thumbnail.')
                     ->columnSpanFull(),
+
                 Toggle::make('is_active')
                     ->label('Active')
                     ->default(true),

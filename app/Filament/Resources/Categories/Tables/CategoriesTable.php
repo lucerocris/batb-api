@@ -31,8 +31,14 @@ class CategoriesTable
 
                 //         return $record->image_url;
                 //     }),
+
                 TextColumn::make('name')
                     ->label('Name'),
+                TextColumn::make('description')
+                    ->label('Description')
+                    ->limit(50),
+                TextColumn::make('slug')
+                    ->label('Slug'),
             ])
             ->filters([
                 TrashedFilter::make(),
