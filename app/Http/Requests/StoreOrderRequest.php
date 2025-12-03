@@ -48,8 +48,8 @@ class StoreOrderRequest extends FormRequest
 
 
             'shippingAddress' => 'required|array',
-            'shippingAddress.firstName' => 'required|string|max:100',
-            'shippingAddress.lastName' => 'required|string|max:100',
+            'shippingAddress.first_name' => 'required|string|max:100',
+            'shippingAddress.last_name' => 'required|string|max:100',
             'shippingAddress.addressLine1' => 'required|string|max:255',
             'shippingAddress.addressLine2' => 'nullable|string|max:255',
             'shippingAddress.city' => 'required|string|max:100',
