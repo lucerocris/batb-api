@@ -295,34 +295,35 @@ class DatabaseSeeder extends Seeder
         return $product;
     }
 
-    private function copyProductImage(Product $product, string $imageName, Category $category): void
+    private function copyProductImage(Product $product, string $imageName): void
     {
-        // Path to seeder images (tracked in git)
+        // Path to seeder images
         $sourceImagePath = database_path("seeders/images/{$imageName}");
 
         if (!File::exists($sourceImagePath)) {
-            $this->command->warn("⚠️  Image not found: {$imageName}");
+            $this->command->warn("⚠️ Image not found: {$imageName}");
             return;
         }
 
-        // Create storage directory structure
-        $categorySlug = Str::slug($category->name);
-        $productSlug = $product->slug;
-        $storageDir = "products/{$categorySlug}/{$productSlug}";
+        // New simplified storage folder
+        $storageDir = "products";
 
         // Ensure directory exists
         Storage::disk('public')->makeDirectory($storageDir);
 
-        // Copy image to storage
+        // Keep original filename OR rename to main.ext (your choice)
         $extension = pathinfo($imageName, PATHINFO_EXTENSION);
-        $filename = "main.{$extension}";
+        $filename = $imageName;
+        // If you want to keep the original filename instead:
+        // $filename = $imageName;
+
         $destinationPath = "{$storageDir}/{$filename}";
 
         // Copy file
         $imageContent = File::get($sourceImagePath);
         Storage::disk('public')->put($destinationPath, $imageContent);
 
-        // Update product with image path
+        // Store simplified path
         $product->update(['image_path' => $destinationPath]);
 
         $this->command->info("📸 Copied image for: {$product->name}");
