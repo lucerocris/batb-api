@@ -12,6 +12,9 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\ImageColumn;
@@ -24,28 +27,43 @@ class ProductsTable
     {
         return $table
             ->columns([
-                ImageColumn::make('image_preview')
+                ImageColumn::make('image_path')
                     ->label('Image')
-                    ->getStateUsing(function ($record) {
-                        if ($record->image_path) {
-                            return asset('storage/' . ltrim($record->image_path, '/'));
-                        }
+                    ->disk('public')
+                    ->visibility('public'),
+                TextColumn::make('stock_status')
+                    ->badge()
+                    ->formatStateUsing(fn(string $state): string => str($state)->headline())
 
-                        return $record->image_url;
+                    ->color(fn(string $state): string => match ($state) {
+                        'available' => 'success',
+                        'unavailable' => 'danger',
+                        default => 'gray',
                     }),
-                TextColumn::make('stock_status'),
-                TextColumn::make('name'),
-                TextColumn::make('sku'),
-                TextColumn::make('is_active')
-                ->label('Status')
-                ->formatStateUsing(fn ($state) => $state ? 'Active' : 'Inactive'),
-                TextColumn::make('cost_price')
-                    ->label('Cost Price')
-                    ->formatStateUsing(fn ($state) => $state ? '$' . number_format($state, 2) : '—'),
+                TextColumn::make('name')
+                    ->searchable(),
+                TextColumn::make('sku')
+                    ->searchable(),
+                ToggleColumn::make('is_active')
+                    ->label('Status'),
+                TextColumn::make('base_price')
+                    ->sortable()
+                    ->label('Price')
+                    ->money('php'),
 
             ])
             ->filters([
-                TrashedFilter::make(),
+                SelectFilter::make('category_id')
+                    ->relationship('category', 'name')
+                    ->label('Category'),
+                TernaryFilter::make('is_active'),
+                TernaryFilter::make('is_featured'),
+                SelectFilter::make('stock_status')
+                    ->options([
+                        'available' => 'Available',
+                        'unavailable' => 'Unavailable',
+                    ])
+                    ->label('Stock Status'),
             ])
             ->recordActions([
                 ViewAction::make(),

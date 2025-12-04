@@ -10,6 +10,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class ProductForm
 {
@@ -28,7 +29,7 @@ class ProductForm
                     ->required()
                     ->maxLength(255)
                     ->live(onBlur: true)
-                    ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
+                    ->afterStateUpdated(fn($state, callable $set) => $set('slug', Str::slug($state))),
                 TextInput::make('slug')
                     ->required()
                     ->maxLength(255)
@@ -60,23 +61,25 @@ class ProductForm
                 Select::make('stock_status')
                     ->options([
                         'available' => 'Available',
-                        'out_of_stock' => 'Out of Stock',
-                        'backorder' => 'Backorder',
-                        'discontinued' => 'Discontinued',
+                        'unavailable' => 'Unavailable',
                     ])
                     ->required()
                     ->default('available'),
-                Select::make('type')
-                    ->options([
-                        'premium' => 'Premium',
-                        'classic' => 'Classic',
-                    ])
-                    ->required(),
                 FileUpload::make('image_path')
                     ->label('Main Image')
                     ->image()
+                    ->disk('public')
                     ->directory('products')
+                    ->visibility('public')
                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/svg'])
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file): string {
+                        $name = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                        $extension = $file->getClientOriginalExtension();
+
+                        $safeName = Str::slug($name) ?: 'product-image';
+
+                        return $safeName . '-' . now()->timestamp . '.' . $extension;
+                    })
                     ->helperText('This will be the product thumbnail.')
                     ->columnSpanFull(),
 
