@@ -49,6 +49,7 @@ class Order extends Model
         'reminder_sent_count',
         'last_reminder_sent',
         'order_date',
+        'created_at'
     ];
 
     protected $casts = [
@@ -100,7 +101,7 @@ class Order extends Model
 
     /**
      * Accept payment proof and update statuses accordingly
-     * 
+     *
      * @param string|null $verifiedBy User ID of the admin who verified the payment
      * @return bool
      */
@@ -113,7 +114,7 @@ class Order extends Model
         $this->payment_status = 'paid';
         $this->fulfillment_status = 'fulfilled';
         $this->payment_verified_date = now();
-        
+
         if ($verifiedBy) {
             $this->payment_verified_by = $verifiedBy;
         }
@@ -123,7 +124,7 @@ class Order extends Model
 
     /**
      * Reject payment proof and update statuses accordingly
-     * 
+     *
      * @param string|null $verifiedBy User ID of the admin who rejected the payment
      * @return bool
      */
@@ -136,7 +137,7 @@ class Order extends Model
         $this->payment_status = 'failed';
         $this->fulfillment_status = 'cancelled';
         $this->payment_verified_date = now();
-        
+
         if ($verifiedBy) {
             $this->payment_verified_by = $verifiedBy;
         }
@@ -147,14 +148,14 @@ class Order extends Model
     /**
      * Progress fulfillment status
      * Only allows progression when payment_status is 'paid'
-     * 
+     *
      * @param string $newStatus The new fulfillment status
      * @return bool
      */
     public function progressFulfillment(string $newStatus): bool
     {
         $allowedStatuses = ['fulfilled', 'shipped', 'delivered'];
-        
+
         if (!in_array($newStatus, $allowedStatuses)) {
             throw new \Exception("Invalid fulfillment status: {$newStatus}");
         }
@@ -178,7 +179,7 @@ class Order extends Model
 
     /**
      * Handle refund and update statuses
-     * 
+     *
      * @param float|null $refundedAmount The amount to refund
      * @return bool
      */
@@ -189,7 +190,7 @@ class Order extends Model
         }
 
         $this->payment_status = 'refunded';
-        
+
         if ($refundedAmount !== null) {
             $this->refunded_amount = $refundedAmount;
         } else {
@@ -205,20 +206,32 @@ class Order extends Model
         return $this->save();
     }
 
+
+    public function getCustomerNameAttribute(): string
+    {
+        $address = $this->shipping_address;
+
+        if (!is_array($address)) {
+            return '';
+        }
+
+        return trim(($address['first_name'] ?? '') . ' ' . ($address['last_name'] ?? ''));
+    }
+
     /**
      * Check if fulfillment can be progressed
-     * 
+     *
      * @return bool
      */
     public function canProgressFulfillment(): bool
     {
-        return $this->payment_status === 'paid' 
+        return $this->payment_status === 'paid'
             && !in_array($this->fulfillment_status, ['delivered', 'cancelled']);
     }
 
     /**
      * Check if payment can be reviewed (accepted or rejected)
-     * 
+     *
      * @return bool
      */
     public function canReviewPayment(): bool
