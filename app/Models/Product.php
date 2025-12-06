@@ -32,6 +32,7 @@ class Product extends Model
         'stock_status',
         'type',
         'image_path',
+        'image_gallery',
         'is_active',
         'is_featured',
         'available_from',
@@ -51,7 +52,7 @@ class Product extends Model
         'low_stock_threshold' => 'integer',
         'track_inventory' => 'boolean',
         'allow_backorder' => 'boolean',
-        // no images array anymore
+        'image_gallery' => 'array',
         'is_active' => 'boolean',
         'is_featured' => 'boolean',
         'available_from' => 'datetime',

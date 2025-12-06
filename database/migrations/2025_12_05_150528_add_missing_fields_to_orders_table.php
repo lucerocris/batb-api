@@ -12,7 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->string('payment_proof_image')->nullable()->after('payment_reference');
+            $table->string('phone_number', 20)->nullable()->after('email');
+            $table->string('status')->nullable()->after('order_number');
+            $table->json('payment_instructions')->nullable()->after('payment_method');
+            $table->decimal('tip', 8, 2)->nullable()->default(0.00)->after('discount_amount');
         });
     }
 
@@ -22,7 +25,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('payment_proof_image');
+            $table->dropColumn(['phone_number', 'status', 'payment_instructions', 'tip']);
         });
     }
 };

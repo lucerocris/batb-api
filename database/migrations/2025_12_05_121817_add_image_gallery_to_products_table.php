@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->string('payment_proof_image')->nullable()->after('payment_reference');
+        Schema::table('products', function (Blueprint $table) {
+            $table->json('image_gallery')->nullable()->after('image_path');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('payment_proof_image');
+        Schema::table('products', function (Blueprint $table) {
+            $table->dropColumn('image_gallery');
         });
     }
 };
