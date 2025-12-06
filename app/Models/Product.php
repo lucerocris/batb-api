@@ -41,6 +41,8 @@ class Product extends Model
         'purchase_count',
         'average_rating',
         'review_count',
+        'created_at',
+        'updated_at'
     ];
 
     protected $casts = [
