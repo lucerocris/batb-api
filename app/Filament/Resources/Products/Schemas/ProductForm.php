@@ -65,9 +65,11 @@ class ProductForm
                     ])
                     ->required()
                     ->default('available'),
-                FileUpload::make('image_path')
-                    ->label('Main Image')
+                FileUpload::make('image_gallery')
+                    ->label('Product Images')
                     ->image()
+                    ->multiple()
+                    ->maxFiles(4)
                     ->disk('public')
                     ->directory('products')
                     ->visibility('public')
@@ -78,9 +80,9 @@ class ProductForm
 
                         $safeName = Str::slug($name) ?: 'product-image';
 
-                        return $safeName . '-' . now()->timestamp . '.' . $extension;
+                        return $safeName . '-' . now()->timestamp . '-' . uniqid() . '.' . $extension;
                     })
-                    ->helperText('This will be the product thumbnail.')
+                    ->helperText('Upload up to 4 images. The first image will be used as the thumbnail.')
                     ->columnSpanFull(),
 
                 Toggle::make('is_active')
