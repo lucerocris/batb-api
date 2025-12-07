@@ -87,6 +87,10 @@ return new class extends Migration
             $table->softDeletes();
             $table->timestamps();
         });
+
+        Schema::table('orders', function (Blueprint $table) {
+            $table->string('image_url')->nullable()->after('currency');
+        });
     }
 
     /**
@@ -94,6 +98,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('orders', function (Blueprint $table) {
+            $table->dropColumn('image_url');
+        });
+
         Schema::dropIfExists('orders');
     }
 };

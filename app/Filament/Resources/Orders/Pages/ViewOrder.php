@@ -13,6 +13,7 @@ use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Schema;
 use Filament\Infolists;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 
 class ViewOrder extends ViewRecord
@@ -36,6 +37,9 @@ class ViewOrder extends ViewRecord
                 ->requiresConfirmation()
                 ->modalHeading('Accept Payment Proof')
                 ->modalDescription('Are you sure you want to accept this payment proof? This will mark the payment as paid and set fulfillment to fulfilled.')
+                ->fillForm([
+                    'adminNotes' => null,
+                ])
                 ->form([
                     Textarea::make('adminNotes')
                         ->label('Admin Notes (Optional)')
@@ -45,7 +49,7 @@ class ViewOrder extends ViewRecord
                 ->action(function (array $data) use ($order) {
                     try {
                         DB::transaction(function () use ($order, $data) {
-                            $order->acceptPayment(auth()->id());
+                            $order->acceptPayment(Auth::id());
                             
                             if (!empty($data['adminNotes'])) {
                                 $order->admin_notes = $data['adminNotes'];
@@ -76,6 +80,9 @@ class ViewOrder extends ViewRecord
                 ->requiresConfirmation()
                 ->modalHeading('Reject Payment Proof')
                 ->modalDescription('Are you sure you want to reject this payment proof? This will mark the payment as failed and cancel the order.')
+                ->fillForm([
+                    'adminNotes' => null,
+                ])
                 ->form([
                     Textarea::make('adminNotes')
                         ->label('Admin Notes (Required)')
@@ -86,7 +93,7 @@ class ViewOrder extends ViewRecord
                 ->action(function (array $data) use ($order) {
                     try {
                         DB::transaction(function () use ($order, $data) {
-                            $order->rejectPayment(auth()->id());
+                            $order->rejectPayment(Auth::id());
                             
                             if (!empty($data['adminNotes'])) {
                                 $order->admin_notes = $data['adminNotes'];
@@ -123,6 +130,9 @@ class ViewOrder extends ViewRecord
                 ->label('Update Fulfillment')
                 ->icon('heroicon-o-truck')
                 ->color('info')
+                ->fillForm([
+                    'fulfillmentStatus' => $nextStatus,
+                ])
                 ->form([
                     Select::make('fulfillmentStatus')
                         ->label('Fulfillment Status')
@@ -165,6 +175,10 @@ class ViewOrder extends ViewRecord
                 ->requiresConfirmation()
                 ->modalHeading('Process Refund')
                 ->modalDescription('This will mark the payment as refunded and cancel the order if not yet delivered.')
+                ->fillForm([
+                    'refundedAmount' => $order->total_amount,
+                    'adminNotes' => null,
+                ])
                 ->form([
                     \Filament\Forms\Components\TextInput::make('refundedAmount')
                         ->label('Refunded Amount')
