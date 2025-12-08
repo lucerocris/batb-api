@@ -34,6 +34,10 @@ class ProductForm
                     ->required()
                     ->maxLength(255)
                     ->unique(ignoreRecord: true),
+                TextInput::make('brand')
+                    ->label('Brand')
+                    ->required()
+                    ->maxLength(255),
                 Textarea::make('description')
                     ->rows(3)
                     ->columnSpanFull(),

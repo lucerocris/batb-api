@@ -9,6 +9,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 
@@ -32,13 +33,15 @@ class OrdersTable
                 //     }),
                 TextColumn::make('shipping_address')
                     ->label('Customer')
+                    ->searchable()
                     ->getStateUsing(function ($record) {
                         $address = is_array($record->shipping_address) ? $record->shipping_address : json_decode($record->shipping_address, true);
                         $firstName = $address['first_name'] ?? '';
                         $lastName = $address['last_name'] ?? '';
                         return trim("$firstName $lastName") ?: 'Unknown User';
                     }),
-                TextColumn::make('order_number'),
+                TextColumn::make('order_number')
+                ->searchable(),
                 TextColumn::make('payment_method')
                     ->formatStateUsing(fn(string $state) => str($state)->replace('_', ' ')->title()),
                 TextColumn::make('payment_status')
@@ -64,11 +67,28 @@ class OrdersTable
                         'cancelled' => 'danger',
                         default => 'gray',
                     }),
-                TextColumn::make('total_amount')->money('php'),
+                TextColumn::make('subtotal')->money('php')->sortable(),
+                TextColumn::make('order_date')
+                    ->label('Order Date')
+                    ->getStateUsing(fn ($record) => $record->order_date ?? $record->created_at)
+                    ->date()
+                    ->sortable(),
 
             ])
             ->filters([
-                //
+                SelectFilter::make('payment_status')
+                    ->options([
+                        'paid' => 'Paid',
+                        'pending' => 'Pending',
+                        'failed' => 'Failed',
+                        'refunded' => 'Refunded',
+                    ])
+                    ->label('Payment Status'),
+                SelectFilter::make('fulfillment_status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'fulfilled' => 'Fulfilled',
+                    ])
             ])
 
             ->recordActions([

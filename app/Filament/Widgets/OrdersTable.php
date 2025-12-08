@@ -51,7 +51,12 @@ class OrdersTable extends TableWidget
                         'cancelled' => 'danger',
                         default => 'gray',
                     }),
-                TextColumn::make('total_amount')->money('php'),
+                TextColumn::make('subtotal')->money('php'),
+                TextColumn::make('order_date')
+                    ->label('Order Date')
+                    ->getStateUsing(fn ($record) => $record->order_date ?? $record->created_at)
+                    ->date()
+                    ->sortable(),
             ])
             ->filters([
                 //

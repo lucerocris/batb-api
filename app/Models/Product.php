@@ -42,6 +42,7 @@ class Product extends Model
         'average_rating',
         'review_count',
         'created_at',
+        'stock_status',
         'updated_at'
     ];
 
@@ -71,6 +72,16 @@ class Product extends Model
         static::creating(function ($product) {
             if (empty($product->sku) && $product->category_id) {
                 $product->sku = ProductSKUGenerator::generateSKU($product->category_id);
+            }
+        });
+
+        static::saving(function (Product $product) {
+            $stock = (int) ($product->stock_quantity ?? 0);
+
+            if ($stock <= 0) {
+                $product->stock_status = 'unavailable';
+            } else {
+                $product->stock_status = 'available';
             }
         });
     }
