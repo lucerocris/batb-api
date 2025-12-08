@@ -90,18 +90,7 @@ class OrderFactory extends Factory
         $phone = '+63' . fake()->numberBetween(9000000000, 9999999999);
 
         // Product images available in storage
-        $productImages = [
-            'products/bape.jpg',
-            'products/bucks.jpg',
-            'products/bulls.jpg',
-            'products/dkny.jpg',
-            'products/gap.jpg',
-            'products/LA.jpg',
-            'products/nets.jpg',
-            'products/nirvana.jpg',
-            'products/onepiece.jpg',
-            'products/soulSearching.jpg',
-        ];
+
 
         return [
             'id' => (string) Str::uuid(),
@@ -160,7 +149,6 @@ class OrderFactory extends Factory
             'order_date' => $orderDate,
             'created_at' => $orderDate,
             'updated_at' => (clone $orderDate)->addHours(fake()->numberBetween(1, 72)),
-            'image_url' => fake()->randomElement($productImages),
         ];
     }
 }

@@ -40,6 +40,7 @@ class StoreOrderRequest extends FormRequest
             'fulfillmentStatus' => 'required|in:pending,fulfilled,shipped,delivered,cancelled',
             'paymentStatus' => 'required|in:pending,paid,failed,refunded',
             'paymentMethod' => 'required|in:bank_transfer,gcash',
+            'paymentReference' => 'nullable|string|max:100',
             'email' => 'required|string|max:100',
             'expiresAt' => 'nullable|date',
             'orderDate' => 'required|date',
@@ -85,11 +86,7 @@ class StoreOrderRequest extends FormRequest
             'orderItems.*.quantity' => 'required|integer|min:1',
             'orderItems.*.unitPrice' => 'required|numeric|min:0',
 
-            // Optional designs metadata array for snapshot
-            'designs' => 'nullable|array',
-            'designs.*.designKey' => 'required|string|max:64',
-            'designs.*.name' => 'nullable|string|max:150',
-            'designs.*.imageUrl' => 'nullable|url|max:2048',
+
 
             // Optional uploaded design images keyed by designKey
             'designImages' => 'nullable|array',

@@ -89,7 +89,7 @@ return new class extends Migration
         });
 
         Schema::table('orders', function (Blueprint $table) {
-            $table->string('image_url')->nullable()->after('currency');
+            $table->string('image_path')->nullable()->after('currency');
         });
     }
 

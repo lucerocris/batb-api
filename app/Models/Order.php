@@ -22,6 +22,7 @@ class Order extends Model
         'user_id',
         'order_number',
         'status',
+        'image_path',
         'fulfillment_status',
         'payment_status',
         'payment_method',

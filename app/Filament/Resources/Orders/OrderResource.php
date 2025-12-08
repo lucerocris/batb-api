@@ -174,12 +174,12 @@ class OrderResource extends Resource
 
                         Section::make('Payment Information')
                         ->schema([
-                            Infolists\Components\ImageEntry::make('image_url')
+                            Infolists\Components\ImageEntry::make('image_path')
                                 ->label('Payment Proof')
                                 ->placeholder('No payment proof uploaded.')
                                 ->getStateUsing(function ($record) {
-                                    if ($record->image_url) {
-                                        return asset('storage/' . ltrim($record->image_url, '/'));
+                                    if ($record->image_path) {
+                                        return asset('storage/' . ltrim($record->image_path, '/'));
                                     }
                                     return null;
                                 })
