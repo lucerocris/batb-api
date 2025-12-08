@@ -99,6 +99,7 @@ class DatabaseSeeder extends Seeder
                 'original_price' => 1500.00,
                 'color' => 'Gray',
                 'image_name' => 'bulls.jpg',
+                'gallery_images' => ['bulls.jpg', 'bulls2.jpg', 'bulls3.jpg', 'bulls4.jpg'],
                 'tags' => ['NBA', 'basketball', 'sports', 'oversized', 'streetwear', 'collaboration'],
             ],
             [
@@ -114,6 +115,7 @@ class DatabaseSeeder extends Seeder
                 'original_price' => 1800.00,
                 'color' => 'White',
                 'image_name' => 'gap.jpg',
+                'gallery_images' => ['gap.jpg', 'gap2.jpg', 'gap3.jpg'],
                 'tags' => ['casual', 'everyday', 'classic', 'boxy fit', 'white'],
             ],
             [
@@ -129,6 +131,7 @@ class DatabaseSeeder extends Seeder
                 'original_price' => 1200.00,
                 'color' => 'Black',
                 'image_name' => 'onepiece.jpg',
+                'gallery_images' => ['onepiece.jpg', 'onepiece2.jpg', 'onepiece3.jpg', 'onepiece4.jpg'],
                 'tags' => ['anime', 'collaboration', 'oversized', 'black', 'pop culture'],
             ],
             [
@@ -144,6 +147,7 @@ class DatabaseSeeder extends Seeder
                 'original_price' => 1500.00,
                 'color' => 'Black',
                 'image_name' => 'LA.jpg',
+                'gallery_images' => ['LA.jpg', 'LA2.jpg', 'LA3.jpg'],
                 'tags' => ['NBA', 'basketball', 'sports', 'oversized', 'black', 'collaboration'],
             ],
             [
@@ -159,6 +163,7 @@ class DatabaseSeeder extends Seeder
                 'original_price' => 1500.00,
                 'color' => 'Green',
                 'image_name' => 'bucks.jpg',
+                'gallery_images' => ['bucks.jpg', 'bucks2.jpg', 'bucks3.jpg', 'bucks4.jpg'],
                 'tags' => ['NBA', 'basketball', 'sports', 'oversized', 'green', 'collaboration'],
             ],
             [
@@ -174,6 +179,7 @@ class DatabaseSeeder extends Seeder
                 'original_price' => 1500.00,
                 'color' => 'Black',
                 'image_name' => 'nets.jpg',
+                'gallery_images' => ['nets.jpg', 'nets2.jpg', 'nets3.jpg'],
                 'tags' => ['NBA', 'basketball', 'sports', 'oversized', 'black', 'premium'],
             ],
             [
@@ -189,6 +195,7 @@ class DatabaseSeeder extends Seeder
                 'original_price' => 1000.00,
                 'color' => 'Brown',
                 'image_name' => 'nirvana.jpg',
+                'gallery_images' => ['nirvana.jpg', 'nirvana2.jpg', 'nirvana3.jpg', 'nirvana4.jpg'],
                 'tags' => ['vintage', 'band', 'music', 'grunge', 'rock', 'oversized'],
             ],
             [
@@ -204,6 +211,7 @@ class DatabaseSeeder extends Seeder
                 'original_price' => 2500.00,
                 'color' => 'Black',
                 'image_name' => 'bape.jpg',
+                'gallery_images' => ['bape.jpg', 'bape2.jpg', 'bape3.jpg', 'bape4.jpg'],
                 'tags' => ['streetwear', 'premium', 'japanese', 'boxy fit', 'black', 'authentic'],
             ],
             [
@@ -219,6 +227,7 @@ class DatabaseSeeder extends Seeder
                 'original_price' => 1800.00,
                 'color' => 'Violet',
                 'image_name' => 'dkny.jpg',
+                'gallery_images' => ['dkny.jpg', 'dkny2.jpg', 'dkny3.jpg'],
                 'tags' => ['women', 'premium', 'casual', 'oversized', 'violet', 'designer'],
             ],
             [
@@ -234,6 +243,7 @@ class DatabaseSeeder extends Seeder
                 'original_price' => 800.00,
                 'color' => 'Black',
                 'image_name' => 'soulSearching.jpg',
+                'gallery_images' => ['soulSearching.jpg', 'soulSearching2.jpg', 'soulSearching3.jpg', 'soulSearching4.jpg'],
                 'tags' => ['women', 'casual', 'everyday', 'loose fit', 'black', 'comfortable'],
             ],
         ];
@@ -265,6 +275,11 @@ class DatabaseSeeder extends Seeder
     {
         $slug = Str::slug($productData['name']);
 
+        // Prepare gallery images with storage paths
+        $galleryImages = array_map(function ($imageName) {
+            return "products/{$imageName}";
+        }, $productData['gallery_images']);
+
         $product = Product::create([
             'id' => (string) Str::uuid(),
             'category_id' => $category->id,
@@ -284,6 +299,7 @@ class DatabaseSeeder extends Seeder
             'stock_status' => 'available',
             'type' => $productData['type'],
             'image_path' => null,
+            'image_gallery' => $galleryImages,
             'is_active' => true,
             'is_featured' => rand(0, 1) == 1,
             'tags' => json_encode($productData['tags']),
@@ -291,6 +307,7 @@ class DatabaseSeeder extends Seeder
 
         // Handle image copying
         $this->copyProductImage($product, $productData['image_name'], $category);
+        $this->copyGalleryImages($product, $productData['gallery_images']);
 
         return $product;
     }
@@ -311,11 +328,8 @@ class DatabaseSeeder extends Seeder
         // Ensure directory exists
         Storage::disk('public')->makeDirectory($storageDir);
 
-        // Keep original filename OR rename to main.ext (your choice)
-        $extension = pathinfo($imageName, PATHINFO_EXTENSION);
+        // Keep original filename
         $filename = $imageName;
-        // If you want to keep the original filename instead:
-        // $filename = $imageName;
 
         $destinationPath = "{$storageDir}/{$filename}";
 
@@ -328,6 +342,33 @@ class DatabaseSeeder extends Seeder
 
         $this->command->info("📸 Copied image for: {$product->name}");
     }
+
+    private function copyGalleryImages(Product $product, array $galleryImageNames): void
+    {
+        $sourceDir = database_path("seeders/images");
+        $storageDir = "products";
+
+        foreach ($galleryImageNames as $imageName) {
+            $sourceImagePath = "{$sourceDir}/{$imageName}";
+
+            if (!File::exists($sourceImagePath)) {
+                $this->command->warn("⚠️ Gallery image not found: {$imageName}");
+                continue;
+            }
+
+            // Ensure directory exists
+            Storage::disk('public')->makeDirectory($storageDir);
+
+            $destinationPath = "{$storageDir}/{$imageName}";
+
+            // Copy file
+            $imageContent = File::get($sourceImagePath);
+            Storage::disk('public')->put($destinationPath, $imageContent);
+        }
+
+        $this->command->info("🖼️ Copied gallery images for: {$product->name}");
+    }
+
     private function attachItemsToOrder(Order $order, Collection $products): void
     {
         $lineItemsTotal = 0;

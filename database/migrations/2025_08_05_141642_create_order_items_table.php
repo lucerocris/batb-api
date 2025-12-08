@@ -17,7 +17,7 @@ return new class extends Migration
             // Foreign key to orders
             $table->foreignUuid('order_id')
                   ->constrained('orders')
-                  ->onDelete('restrict');
+                  ->cascadeOnDelete();
 
             // Foreign key to products
             $table->foreignUuid('product_id')
