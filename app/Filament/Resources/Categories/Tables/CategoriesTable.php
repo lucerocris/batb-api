@@ -10,10 +10,12 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ImageColumn;
+use Nette\Utils\Image;
 
 class CategoriesTable
 {
@@ -31,12 +33,17 @@ class CategoriesTable
 
                 //         return $record->image_url;
                 //     }),
-
+                ImageColumn::make('image_path')
+                    ->label('Image')
+                    ->disk('public')
+                    ->visibility('public'),
                 TextColumn::make('name')
                     ->label('Name'),
                 TextColumn::make('description')
                     ->label('Description')
                     ->limit(50),
+                ToggleColumn::make('is_active')
+                    ->label('Active Status'),
                 TextColumn::make('slug')
                     ->label('Slug'),
             ])

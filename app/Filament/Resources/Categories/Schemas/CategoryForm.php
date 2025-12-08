@@ -7,6 +7,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\ToggleColumn;
 
 class CategoryForm
 {
@@ -17,7 +18,7 @@ class CategoryForm
                 TextInput::make('name')
                         ->label('Category Name')
                                     ->filled(),
-                
+
                 TextInput::make('slug')
                         ->label('Category Slug')
                                     ->filled(),
@@ -26,9 +27,13 @@ class CategoryForm
                         ->label('Description')
                                     ->filled(),
 
-                TextInput::make('image_path')
-                    ->label('image Path')
-                                ->filled(),
+                FileUpload::make('image_path')
+                    ->label('Image')
+                    ->image()
+                    ->disk('public')
+                    ->directory('categories')
+                    ->preserveFilenames(),
+
                 Select::make('is_active')
                 ->label('Active Status')
                     ->options([
@@ -36,7 +41,6 @@ class CategoryForm
                         1 => 'Active',
                     ])
                     ->filled(),
-                
             ]);
     }
 }
