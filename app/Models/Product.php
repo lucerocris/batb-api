@@ -43,6 +43,7 @@ class Product extends Model
         'review_count',
         'created_at',
         'stock_status',
+        'stock_quantity',
         'updated_at'
     ];
 

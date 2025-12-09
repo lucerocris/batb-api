@@ -51,6 +51,7 @@ class ProductInfo
                                             ->copyMessage('SKU copied'),
                                         TextEntry::make('category.name')
                                             ->label('Category'),
+                                        TextEntry::make('brand')->label('Brand')
                                     ]),
                                     Grid::make([
                                         'default' => 1,

@@ -46,6 +46,7 @@ class ProductForm
                     ->rows(2)
                     ->maxLength(500)
                     ->columnSpanFull(),
+                TextInput::make('stock_quantity')->label('Stock Quantity')->numeric()->minValue(0),
                 TextInput::make('base_price')
                     ->label('Base Price')
                     ->numeric()

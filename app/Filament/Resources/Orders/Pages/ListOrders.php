@@ -15,7 +15,6 @@ class ListOrders extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
             ExportAction::make()
             ->exporter(OrderExporter::class),
         ];
